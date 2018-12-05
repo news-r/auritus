@@ -1,0 +1,5 @@
+^LICENSE\.md$
+^auritus\.Rproj$
+^\.Rproj\.user$
+_auritus.yml
+data

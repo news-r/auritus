@@ -1,0 +1,18 @@
+
+queries:
+  - "Wine OR Champagne is_first:true"
+
+segments:
+  - segment1:
+    - name: "Cabernet"
+    - search: "cabernet"
+  - segment2:
+    - name: "Pinot Noir"
+    - search: 'pinot noir'
+  - segment3:
+    - name: "Champagne"
+    - search: 'champagne OR "sparkling wine"'
+
+analytics:
+  - ganalytics: 12345
+  - hotjar: 12345
