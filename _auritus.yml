@@ -1,4 +1,6 @@
 
+token: "xxXX0XX0xXxxXxx0XxXX0xXx"
+
 queries:
   - "Wine OR Champagne is_first:true"
 

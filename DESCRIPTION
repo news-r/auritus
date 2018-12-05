@@ -10,5 +10,10 @@ Imports:
   shiny,
   yaml,
   crayon,
-  cli
+  magrittr,
+  cli,
+  utils,
+  webhoser
 RoxygenNote: 6.1.1
+Remotes:
+  JohnCoene/webhoser
