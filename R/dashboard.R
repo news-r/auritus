@@ -2,11 +2,13 @@
 #'
 #' Auritus initial configuration.
 #'
-#' @inheritParams initial-crawl
+#' @inheritParams crawl
 #'
 #' @note Read the documentation first.
 #'
 #' @importFrom utils browseURL
+#' @import shiny
+#' @import dplyr
 #' @export
 setup_auritus <- function(days = 30L, quiet = FALSE, pages = 3L){
 
@@ -39,7 +41,7 @@ setup_auritus <- function(days = 30L, quiet = FALSE, pages = 3L){
 
   # warn if no database
   if(!"database" %in% settings_list){
-    cat(crayon::yellow(cli::symbol$warning), "_auritus.yml has not", crayon::underline("database"), "setup.\n")
+    cat(crayon::yellow(cli::symbol$warning), "_auritus.yml has no", crayon::underline("database"), "setup.\n")
 
     # prompt user
     db_answer <- "none"
@@ -53,7 +55,7 @@ setup_auritus <- function(days = 30L, quiet = FALSE, pages = 3L){
       # prompt user to create data directory
       create_answer <- "none"
       while (!tolower(create_answer) %in% "y" & !tolower(create_answer) %in% "n") {
-        cat(crayon::yellow(cli::symbol$warning), "This is not advised if you expect a large amount of news coverage for your", crayon::underline("queries."), "\n")
+        cat(crayon::yellow(cli::symbol$warning), "This is not advised if you expect a", crayon::underline("large amount"), "of news coverage for your queries.\n")
         create_answer <- readline("May I create a 'data' directory to store the data? (y/n)")
       }
 
@@ -63,7 +65,7 @@ setup_auritus <- function(days = 30L, quiet = FALSE, pages = 3L){
 
         # if directory exists prompt whether to override
         if(dir.exists("data")){
-          cat(crayon::red(cli::symbol$cross), "Cannot override current", crayon::underline("data"), "directory.\n")
+          cat(crayon::red(cli::symbol$cross), "Delete the already present", crayon::underline("data"), "directory.\n")
           return(NULL)
         }
 
@@ -75,13 +77,24 @@ setup_auritus <- function(days = 30L, quiet = FALSE, pages = 3L){
 
           initial_crawl <- "none"
           while (!tolower(initial_crawl) %in% "y" & !tolower(initial_crawl) %in% "n") {
-            initial_crawl <- readline("Do you want to run ana initial 30 day crawl? (y/n)")
+            initial_crawl <- readline(
+              paste("Do you want to run an initial", days, "day crawl of", pages, "pages? (y/n)")
+            )
           }
 
           if(initial_crawl == "y"){
-            initial_webhose_crawl(days = days, quiet = quiet, pages = pages)
+            crawl_auritus(days = days, quiet = quiet, pages = pages)
           } else {
             cat(crayon::yellow(cli::symbol$warning), "Not crawling data, manually run", crayon::underline("initial-crawl"), "before launching auritus.\n")
+
+            # delete directory if fail
+            rm_dir <-unlink("data", recursive = TRUE)
+
+            if(rm_dir == 0)
+              cat(crayon::red(cli::symbol$cross), "Could not delete 'data' directory.\n")
+            else
+              cat(crayon::green(cli::symbol$tick), "Successfully deleted 'data' directory!\n")
+
             return(NULL)
           }
 

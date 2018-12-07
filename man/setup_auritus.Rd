@@ -11,7 +11,8 @@ setup_auritus(days = 30L, quiet = FALSE, pages = 3L)
 
 \item{quiet}{Whether to print helpful messages in the console (default recommended), passed to \link[webhoser]{wh_news}.}
 
-\item{pages}{Number of pages of data to crawl, defaults to \code{3L} to crawl all 3 pages of data, set to \code{Inf} (infinite) to collect all data available under your plan (at your own rirks).}
+\item{pages}{Number of pages of data to crawl, defaults to \code{3L} to crawl all 3 pages of data, set to \code{Inf} (infinite) to collect all data available under your plan (at your own rirks).
+1 page of results = 1 query = 100 articles (you have 1,000 free queries per month).}
 }
 \description{
 Auritus initial configuration.

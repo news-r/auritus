@@ -1,9 +1,16 @@
 
-token: "xxXX0XX0xXxxXxx0XxXX0xXx"
+# your webhose token
+# free @ webhose.io
+token: "c7b6350a-9b6a-4b2e-950b-47cfa96b0fa9"
 
+# minimum setup = 1 query
+# each query MUST have an id and a search
 queries:
-  - "Wine OR Champagne is_first:true"
+  - wine:
+    - id: 1
+    - search: "Wine OR Champagne is_first:true"
 
+# segments to categorise your data
 segments:
   - segment1:
     - name: "Cabernet"
@@ -15,6 +22,7 @@ segments:
     - name: "Champagne"
     - search: 'champagne OR "sparkling wine"'
 
+# analytics to track site usage
 analytics:
   - ganalytics: 12345
   - hotjar: 12345

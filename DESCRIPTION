@@ -13,7 +13,8 @@ Imports:
   magrittr,
   cli,
   utils,
-  webhoser
+  webhoser,
+  dplyr
 RoxygenNote: 6.1.1
 Remotes:
   JohnCoene/webhoser
