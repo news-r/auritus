@@ -15,3 +15,7 @@
   dat$crawled <- .parse_dates(dat$crawled)
   return(dat)
 }
+
+.segment <- function(data, segments){
+
+}

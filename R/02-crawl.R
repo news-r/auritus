@@ -98,7 +98,7 @@ crawl_auritus <- function(days = 30L, quiet = FALSE, pages = 3L, append = FALSE,
         query_id = q$id
       )
 
-    query <- .preproc_crawl(query)
+    query <- .preproc_crawl(query, settings$segments)
 
     articles <- rbind.data.frame(articles, query)
 

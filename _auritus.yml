@@ -13,14 +13,17 @@ queries:
 # segments to categorise your data
 segments:
   - segment1:
+    - query: 1
     - name: "Cabernet"
-    - search: "cabernet"
+    - keyword: "cabernet"
   - segment2:
+    - query: 1
     - name: "Pinot Noir"
-    - search: 'pinot noir'
+    - keyword: 'pinot noir'
   - segment3:
+    - query: 1
     - name: "Champagne"
-    - search: 'champagne OR "sparkling wine"'
+    - keyword: 'champagne'
 
 # analytics to track site usage
 analytics:
