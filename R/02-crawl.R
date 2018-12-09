@@ -108,7 +108,8 @@ crawl_auritus <- function(days = 30L, quiet = FALSE, pages = 3L, append = FALSE,
       settings$token,
       q$search,
       ts = TS,
-      quiet = quiet
+      quiet = quiet,
+      highlight = TRUE
     ) %>%
       webhoser::wh_paginate(pages) %>%
       webhoser::wh_collect() %>%
