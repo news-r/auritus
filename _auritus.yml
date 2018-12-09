@@ -15,15 +15,15 @@ segments:
   - segment1:
     - query: 1
     - name: "Cabernet"
-    - keyword: "cabernet"
+    - regex: "cabernet"
   - segment2:
     - query: 1
     - name: "Pinot Noir"
-    - keyword: 'pinot noir'
+    - regex: "Pinot Noir"
   - segment3:
     - query: 1
     - name: "Champagne"
-    - keyword: 'champagne'
+    - regex: "Champagne"
 
 # analytics to track site usage
 analytics:

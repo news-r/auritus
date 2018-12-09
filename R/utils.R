@@ -16,6 +16,20 @@
   return(dat)
 }
 
-.segment <- function(data, segments){
+#' Convertes segements list into a data.frame
+#' @param settings raw \code{yml} list
+.segments2df <- function(settings){
+  suppressWarnings(
+    settings$segments %>%
+      purrr::map(as.data.frame) %>%
+      purrr::map(function(x){
+        names(x) <- gsub("segment.\\.", "", names(x))
+        x
+      }) %>%
+      purrr::map_df(dplyr::bind_rows)
+  )
+}
 
+.segment <- function(data, segments, search){
+  data
 }

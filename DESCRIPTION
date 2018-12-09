@@ -14,7 +14,8 @@ Imports:
   cli,
   utils,
   webhoser,
-  dplyr
+  dplyr,
+  purrr
 RoxygenNote: 6.1.1
 Remotes:
   JohnCoene/webhoser
