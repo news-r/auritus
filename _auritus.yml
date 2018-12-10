@@ -1,7 +1,7 @@
 
 # your webhose token
 # free @ webhose.io
-token: "c7b6350a-9b6a-4b2e-950b-47cfa96b0fa9"
+token: "fd17174d-53ab-49d7-b19a-3351220490e7"
 
 # minimum setup = 1 query
 # each query MUST have an id and a search
@@ -12,15 +12,15 @@ queries:
 
 # segments to categorise your data
 segments:
-  - segment1:
+  - segment:
     - query: 1
     - name: "Cabernet"
     - regex: "cabernet"
-  - segment2:
+  - segment:
     - query: 1
     - name: "Pinot Noir"
     - regex: "Pinot Noir"
-  - segment3:
+  - segment:
     - query: 1
     - name: "Champagne"
     - regex: "Champagne"

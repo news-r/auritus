@@ -82,8 +82,9 @@ crawl_auritus <- function(days = 30L, quiet = FALSE, pages = 3L, append = FALSE,
   }
 
   if("segments" %in% settings_list){
+
     segments <- .segments2df(settings)
-    query <- .segment(query, segments, q$id[i])
+
     cat(crayon::yellow(cli::symbol$warning), "The following segments will be applied:\n")
     for(i in 1:nrow(segments)){
       cat(

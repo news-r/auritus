@@ -83,7 +83,16 @@ setup_auritus <- function(days = 30L, quiet = FALSE, pages = 3L){
           }
 
           if(initial_crawl == "y"){
-            crawl_auritus(days = days, quiet = quiet, pages = pages)
+            crawled <- tryCatch(
+              crawl_auritus(days = days, quiet = quiet, pages = pages),
+              error = function(e) e
+            )
+
+            if(inherits(crawled, "error")){
+              cat(crayon::red(cli::symbol$cross), "Crawl error, deleting", crayon::underline("data"), "directory.")
+              unlink("data", recursive = TRUE)
+            }
+
           } else {
             cat(crayon::yellow(cli::symbol$warning), "Not crawling data, manually run", crayon::underline("initial-crawl"), "before launching auritus.\n")
 
