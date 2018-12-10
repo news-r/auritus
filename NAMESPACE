@@ -2,6 +2,7 @@
 
 export("%>%")
 export(crawl_auritus)
+export(launch_auritus)
 export(setup_auritus)
 import(dplyr)
 import(shiny)

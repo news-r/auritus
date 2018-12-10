@@ -28,10 +28,15 @@
   return(segments)
 }
 
+#' Segment to valid column name
+#' @param x A segment name
 .segment2name <- function(x){
   gsub("[[:space:]]|[[:cntrl:]]|[[:blank:]]|[[:punct:]]", "", x)
 }
 
+#' A A valid grep
+#' @param x A valid regex.
+#' @param y a valid column name.
 .grp <-function(x, y){
   resp <- grep(x, y)
   if(!length(resp))
