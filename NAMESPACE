@@ -3,6 +3,8 @@
 export("%>%")
 export(crawl_auritus)
 export(launch_auritus)
+export(load_data)
+export(segment_data)
 export(setup_auritus)
 import(dplyr)
 import(shiny)

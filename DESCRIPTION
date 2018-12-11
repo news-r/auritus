@@ -14,8 +14,10 @@ Imports:
   cli,
   utils,
   webhoser,
+  webhoser.extension,
   dplyr,
   purrr
 RoxygenNote: 6.1.1
 Remotes:
-  JohnCoene/webhoser
+  JohnCoene/webhoser,
+  JohnCoene/webhoser.extension

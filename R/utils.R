@@ -11,8 +11,8 @@
 #' Preprocess results of webhose.io
 #' @param dat Data as returned by webhoser.
 .preproc_crawl <- function(dat){
-  dat$thread.published <- .parse_dates(dat$thread.published)
-  dat$crawled <- .parse_dates(dat$crawled)
+  dat$thread.published <- webhoser.extension::whe_date(dat$thread.published)
+  dat$crawled <- webhoser.extension::whe_date(dat$crawled)
   return(dat)
 }
 
@@ -34,17 +34,10 @@
   gsub("[[:space:]]|[[:cntrl:]]|[[:blank:]]|[[:punct:]]", "", x)
 }
 
-#' A A valid grep
-#' @param x A valid regex.
-#' @param y a valid column name.
-.grp <-function(x, y){
-  resp <- grep(x, y)
-  if(!length(resp))
-    rep(0,length(y))
-  else
-    ifelse(is.na(resp), 0, resp)
-}
-
+#' Segment
+#' @param data data as returned by crawl.
+#' @param segments segments data.frame.
+#' @param id query id.
 .segment <- function(data, segments, id){
 
   relevant_segments <- segments %>%
@@ -56,11 +49,14 @@
 
       nm <- .segment2name(relevant_segments$name[i])
 
-      nm_title <- paste0(nm, "_title")
-      nm_text <- paste0(nm, "_text")
+      nm_title <- paste0(nm, "_title_segment")
+      nm_text <- paste0(nm, "_text_segment")
+      nm_1p <- paste0(nm, "_1p_segment")
 
-      data[[nm_title]] <- .grp(relevant_segments$regex[[i]], data$thread.title)
-      data[[nm_text]] <- .grp(relevant_segments$regex[[i]], data$text)
+      data <- data %>% 
+        webhoser.extension::whe_search_1p(relevant_segments$regex[[i]], nm_1p) %>% 
+        webhoser.extension::whe_search(relevant_segments$regex[[i]], nm_title, "thread.title") %>% 
+        webhoser.extension::whe_search(relevant_segments$regex[[i]], nm_text, "text")
     }
 
   }

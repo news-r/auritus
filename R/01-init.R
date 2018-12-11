@@ -12,7 +12,15 @@
 #' @export
 setup_auritus <- function(days = 30L, quiet = FALSE, pages = 3L){
 
-  settings <- yaml::read_yaml("_auritus.yml")
+  config <- "_auritus.yml"
+  
+  if(!file.exists(config)){
+    cat(
+      crayon::red(cli::symbol$cross), "No", crayon::underline("_auritus.yml"), "configuration file."
+    )
+  }
+  
+  settings <- yaml::read_yaml(config)
   settings_list <- names(settings)
 
   # stop if no query present
@@ -46,7 +54,7 @@ setup_auritus <- function(days = 30L, quiet = FALSE, pages = 3L){
     # prompt user
     db_answer <- "none"
     while (!tolower(db_answer) %in% "y" & !tolower(db_answer) %in% "n") {
-      db_answer <- readline("Do you want to store the data locally? (y/n)")
+      db_answer <- readline("Do you want to store the data locally? (y/n) ")
     }
 
     # create directory if yes
@@ -56,7 +64,7 @@ setup_auritus <- function(days = 30L, quiet = FALSE, pages = 3L){
       create_answer <- "none"
       while (!tolower(create_answer) %in% "y" & !tolower(create_answer) %in% "n") {
         cat(crayon::yellow(cli::symbol$warning), "This is not advised if you expect a", crayon::underline("large amount"), "of news coverage for your queries.\n")
-        create_answer <- readline("May I create a 'data' directory to store the data? (y/n)")
+        create_answer <- readline("May I create a 'data' directory to store the data? (y/n) ")
       }
 
       # if yes prompt user
@@ -78,7 +86,7 @@ setup_auritus <- function(days = 30L, quiet = FALSE, pages = 3L){
           initial_crawl <- "none"
           while (!tolower(initial_crawl) %in% "y" & !tolower(initial_crawl) %in% "n") {
             initial_crawl <- readline(
-              paste("Do you want to run an initial", days, "day crawl of", pages, "pages? (y/n)")
+              paste("Do you want to run an initial", days, "day crawl of", pages, "pages? (y/n) ")
             )
           }
 

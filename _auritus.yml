@@ -8,22 +8,18 @@ token: "fd17174d-53ab-49d7-b19a-3351220490e7"
 queries:
   - wine:
     - id: 1
-    - search: "Wine OR Champagne is_first:true"
+    - search: '"wine" OR "champagne" is_first:true language:english site_type:news'
 
 # segments to categorise your data
 segments:
   - segment:
     - query: 1
-    - name: "Cabernet"
-    - regex: "cabernet"
-  - segment:
-    - query: 1
-    - name: "Pinot Noir"
-    - regex: "Pinot Noir"
+    - name: "Wine"
+    - regex: "wine|Wine"
   - segment:
     - query: 1
     - name: "Champagne"
-    - regex: "Champagne"
+    - regex: "champagne|Champagne"
 
 # analytics to track site usage
 analytics:
