@@ -1,4 +1,4 @@
-# auritus
+![](man/figures/logo.png)
 
 Open-source media monitoring platform.
 
