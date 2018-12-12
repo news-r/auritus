@@ -1,12 +1,13 @@
 globalVariables("query_id")
 
-#' Load data
+#' @title Load data
 #' 
-#' Load crawled data.
+#' @description Load data collected with \code{\link{crawl_data}} or \code{\link{setup_auritus}}.
 #' 
 #' @examples 
 #' \dontrun{data <- load_data()}
 #' 
+#' @name load
 #' @export
 load_data <- function(){
   
@@ -22,16 +23,18 @@ load_data <- function(){
   return(out)
 }
 
-#' Segment
+#' @title Segment
 #' 
-#' Re-segments all the data.
+#' @description Re-segments all the data using segments in \code{_auritus.yml}.
 #' 
+#' @name segment
 #' @export
 segment_data <- function(){
   
   config <- "_auritus.yml"
   
   if(!file.exists(config)){
+    
     cat(
       crayon::red(cli::symbol$cross), "No", crayon::underline("_auritus.yml"), "configuration file."
     )

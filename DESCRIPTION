@@ -7,16 +7,19 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports:
-  shiny,
-  yaml,
-  crayon,
-  magrittr,
   cli,
+  yaml,
   utils,
-  webhoser,
-  webhoser.extension,
+  shiny,
   dplyr,
-  purrr
+  purrr,
+  crayon,
+  bs4Dash,
+  magrittr,
+  webhoser,
+  shinythemes,
+  shinyWidgets,
+  webhoser.extension
 RoxygenNote: 6.1.1
 Remotes:
   JohnCoene/webhoser,

@@ -13,7 +13,7 @@
 #' 
 #' @name crawl
 #' @export
-crawl_auritus <- function(days = 30L, quiet = FALSE, pages = 3L, append = FALSE, 
+crawl_data <- function(days = 30L, quiet = FALSE, pages = 3L, append = FALSE, 
                           apply_segments = TRUE, since_last = TRUE, ...){
   
   config <- "_auritus.yml"
@@ -22,6 +22,7 @@ crawl_auritus <- function(days = 30L, quiet = FALSE, pages = 3L, append = FALSE,
     cat(
       crayon::red(cli::symbol$cross), "No", crayon::underline("_auritus.yml"), "configuration file."
     )
+    return(NULL)
   }
 
   TS <- Sys.Date() - days

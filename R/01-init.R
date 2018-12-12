@@ -9,6 +9,7 @@
 #' @importFrom utils browseURL
 #' @import shiny
 #' @import dplyr
+#' @import shinyWidgets
 #' @export
 setup_auritus <- function(days = 30L, quiet = FALSE, pages = 3L){
 
@@ -18,6 +19,7 @@ setup_auritus <- function(days = 30L, quiet = FALSE, pages = 3L){
     cat(
       crayon::red(cli::symbol$cross), "No", crayon::underline("_auritus.yml"), "configuration file."
     )
+    return(NULL)
   }
   
   settings <- yaml::read_yaml(config)
@@ -92,7 +94,7 @@ setup_auritus <- function(days = 30L, quiet = FALSE, pages = 3L){
 
           if(initial_crawl == "y"){
             crawled <- tryCatch(
-              crawl_auritus(days = days, quiet = quiet, pages = pages),
+              crawl_data(days = days, quiet = quiet, pages = pages),
               error = function(e) e
             )
 

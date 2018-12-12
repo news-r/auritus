@@ -2,11 +2,11 @@
 % Please edit documentation in R/02-crawl.R
 \name{crawl}
 \alias{crawl}
-\alias{crawl_auritus}
+\alias{crawl_data}
 \title{Initial Crawl}
 \usage{
-crawl_auritus(days = 30L, quiet = FALSE, pages = 3L,
-  append = FALSE, apply_segments = TRUE, since_last = TRUE, ...)
+crawl_data(days = 30L, quiet = FALSE, pages = 3L, append = FALSE,
+  apply_segments = TRUE, since_last = TRUE, ...)
 }
 \arguments{
 \item{days}{Number of days from today (\code{Sys.Date()}) to craw articles.}
