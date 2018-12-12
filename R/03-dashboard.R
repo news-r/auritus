@@ -1,4 +1,6 @@
-#' Launch Dashboard
+#' Launch Auritus
+#' 
+#' Launch Auritus.
 #'
 #' @export
 launch_auritus <- function(){
