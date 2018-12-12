@@ -9,10 +9,21 @@
 #' @param append If data has been previously crawled and stored, whether to append new results to it (set to \code{TRUE}).
 #' @param apply_segments If TRUE applies the \code{segments} from \code{_auritus.yml}.
 #' @param since_last If \code{TRUE} crawls data since the most recently published article in dataset (recommended). Only applies if \code{append} is \code{TRUE} (and data already exists).
-#'
+#' @param ... Any other parameter to pass to \link[webhoser]{wh_news}.
+#' 
 #' @name crawl
 #' @export
-crawl_auritus <- function(days = 30L, quiet = FALSE, pages = 3L, append = FALSE, apply_segments = TRUE, since_last = TRUE){
+crawl_data <- function(days = 30L, quiet = FALSE, pages = 3L, append = FALSE, 
+                          apply_segments = TRUE, since_last = TRUE, ...){
+  
+  config <- "_auritus.yml"
+  
+  if(!file.exists(config)){
+    cat(
+      crayon::red(cli::symbol$cross), "No", crayon::underline("_auritus.yml"), "configuration file."
+    )
+    return(NULL)
+  }
 
   TS <- Sys.Date() - days
 
@@ -29,7 +40,7 @@ crawl_auritus <- function(days = 30L, quiet = FALSE, pages = 3L, append = FALSE,
     days <- 30L
   }
 
-  settings <- yaml::read_yaml("_auritus.yml")
+  settings <- yaml::read_yaml(config)
   settings_list <- names(settings)
 
   # stop if no query present

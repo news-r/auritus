@@ -7,5 +7,5 @@
 launch_auritus()
 }
 \description{
-Launch Dashboard
+Launch Auritus.
 }
