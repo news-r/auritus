@@ -11,7 +11,9 @@ homeUI <- function(id){
         class = "jumbotron",
         h1("auritus", class = "auritus"),
         br(),
-        p("Free, Open-source Public Relations Analytics Platform.")
+        p("Free, Open-source Media Monitoring Platform."),
+        br(),
+        actionButton(ns("overview"), "Overview")
       )
     )
   )

@@ -2,7 +2,7 @@
 % Please edit documentation in R/03-dashboard.R
 \name{launch_auritus}
 \alias{launch_auritus}
-\title{Launch Dashboard}
+\title{Launch Auritus}
 \usage{
 launch_auritus()
 }

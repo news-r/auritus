@@ -17,20 +17,21 @@ launch_auritus <- function(){
   settings <- yaml::read_yaml(config)
   settings_list <- names(settings)
   
-  if(!"theme" %in% settings_list){
+  if(!"theme" %in% names(settings[["style"]])){
     cat(
       crayon::yellow(cli::symbol$warning), "No theme set in _autitus.yml, defaulting to",
       crayon::underline("paper.\n")
     )
     theme <- "paper"
   } else {
-    theme <- settings$theme
+    theme <- settings[["style"]][["theme"]]
   }
   
   ui <- navbarPage(
     title = "auritus",
     windowTitle = "auritus",
     id = "navbarTabs",
+    inverse = settings[["style"]][["inverse"]] %||% FALSE,
     theme = shinythemes::shinytheme(theme),
     tabPanel(
       "Home",

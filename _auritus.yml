@@ -1,5 +1,7 @@
 # theme
-theme: paper
+style:
+  theme: paper
+  inverse: false
 
 # your webhose token
 # free @ webhose.io
