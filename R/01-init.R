@@ -66,7 +66,9 @@ setup_auritus <- function(days = 30L, quiet = FALSE, pages = 3L){
       create_answer <- "none"
       while (!tolower(create_answer) %in% "y" & !tolower(create_answer) %in% "n") {
         cat(crayon::yellow(cli::symbol$warning), "This is not advised if you expect a", crayon::underline("large amount"), "of news coverage for your queries.\n")
-        create_answer <- readline("May I create a 'data' directory to store the data? (y/n) ")
+        create_answer <- readline(
+          cat("May I create a", crayon::underline("data"), "directory to store the data? (y/n) ")
+        )
       }
 
       # if yes prompt user
@@ -88,7 +90,7 @@ setup_auritus <- function(days = 30L, quiet = FALSE, pages = 3L){
           initial_crawl <- "none"
           while (!tolower(initial_crawl) %in% "y" & !tolower(initial_crawl) %in% "n") {
             initial_crawl <- readline(
-              paste("Do you want to run an initial", days, "day crawl of", pages, "pages? (y/n) ")
+              cat("Do you want to run an initial", days, "day crawl of", pages, "pages? (y/n) ")
             )
           }
 

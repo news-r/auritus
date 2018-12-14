@@ -6,7 +6,7 @@
 \title{Initial Crawl}
 \usage{
 crawl_data(days = 30L, quiet = FALSE, pages = 3L, append = FALSE,
-  apply_segments = TRUE, since_last = TRUE, ...)
+  apply_segments = TRUE, since_last = TRUE, pause = 5, ...)
 }
 \arguments{
 \item{days}{Number of days from today (\code{Sys.Date()}) to craw articles.}
@@ -21,6 +21,8 @@ crawl_data(days = 30L, quiet = FALSE, pages = 3L, append = FALSE,
 \item{apply_segments}{If TRUE applies the \code{segments} from \code{_auritus.yml}.}
 
 \item{since_last}{If \code{TRUE} crawls data since the most recently published article in dataset (recommended). Only applies if \code{append} is \code{TRUE} (and data already exists).}
+
+\item{pause}{Time in seconds, to wait before crawling.}
 
 \item{...}{Any other parameter to pass to \link[webhoser]{wh_news}.}
 }

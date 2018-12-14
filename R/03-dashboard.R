@@ -27,12 +27,34 @@ launch_auritus <- function(){
     theme <- settings[["style"]][["theme"]]
   }
   
+  if(!"font" %in% names(settings[["style"]])){
+    cat(
+      crayon::yellow(cli::symbol$warning), "No font set in _autitus.yml, defaulting to",
+      crayon::underline("Raleway.\n")
+    )
+    
+    font <- "Raleway"
+  } else {
+    font <- settings[["style"]][["font"]]
+  }
+  
+  font_name <- gsub("[[:space:]]", "+", font)
+  
   ui <- navbarPage(
     title = "auritus",
     windowTitle = "auritus",
     id = "navbarTabs",
     inverse = settings[["style"]][["inverse"]] %||% FALSE,
     theme = shinythemes::shinytheme(theme),
+    header = tagList(
+      tags$link(
+        href = paste0("https://fonts.googleapis.com/css?family=", font_name),
+        rel = "stylesheet"
+      ),
+      tags$style(
+        paste0("*{font-family: '", font, "', sans-serif;}")
+      )
+    ),
     tabPanel(
       "Home",
       icon = icon("home"),

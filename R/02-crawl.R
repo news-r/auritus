@@ -9,12 +9,13 @@
 #' @param append If data has been previously crawled and stored, whether to append new results to it (set to \code{TRUE}).
 #' @param apply_segments If TRUE applies the \code{segments} from \code{_auritus.yml}.
 #' @param since_last If \code{TRUE} crawls data since the most recently published article in dataset (recommended). Only applies if \code{append} is \code{TRUE} (and data already exists).
+#' @param pause Time in seconds, to wait before crawling.
 #' @param ... Any other parameter to pass to \link[webhoser]{wh_news}.
 #' 
 #' @name crawl
 #' @export
 crawl_data <- function(days = 30L, quiet = FALSE, pages = 3L, append = FALSE, 
-                          apply_segments = TRUE, since_last = TRUE, ...){
+                          apply_segments = TRUE, since_last = TRUE, pause = 5, ...){
   
   config <- "_auritus.yml"
   
@@ -104,7 +105,10 @@ crawl_data <- function(days = 30L, quiet = FALSE, pages = 3L, append = FALSE,
     }
 
     # give user a change to stop process
-    Sys.sleep(3)
+    cat(
+      crayon::yellow(cli::symbol$warning), "Hit", crayon::underline("CTRL + C"), "to cancel."
+    )
+    Sys.sleep(pause)
   }
 
   cat(

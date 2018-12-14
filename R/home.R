@@ -13,7 +13,7 @@ homeUI <- function(id){
         br(),
         p("Free, Open-source Media Monitoring Platform."),
         br(),
-        actionButton(ns("overview"), "Overview")
+        actionButton(ns("overview"), "Overview", class = "btn-primary")
       )
     )
   )

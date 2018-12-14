@@ -1,7 +1,8 @@
 # theme
 style:
-  theme: paper
-  inverse: false
+  theme: paper # bootswatch theme
+  inverse: false # inverse navbar
+  font: Raleway # google font
 
 # your webhose token
 # free @ webhose.io
