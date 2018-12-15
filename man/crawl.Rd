@@ -6,7 +6,8 @@
 \title{Initial Crawl}
 \usage{
 crawl_data(days = 30L, quiet = FALSE, pages = 3L, append = FALSE,
-  apply_segments = TRUE, since_last = TRUE, pause = 5, ...)
+  apply_segments = TRUE, since_last = TRUE, pause = 5,
+  overwrite = FALSE, ...)
 }
 \arguments{
 \item{days}{Number of days from today (\code{Sys.Date()}) to craw articles.}
@@ -23,6 +24,8 @@ crawl_data(days = 30L, quiet = FALSE, pages = 3L, append = FALSE,
 \item{since_last}{If \code{TRUE} crawls data since the most recently published article in dataset (recommended). Only applies if \code{append} is \code{TRUE} (and data already exists).}
 
 \item{pause}{Time in seconds, to wait before crawling.}
+
+\item{overwrite}{Set to \code{TRUE} to overwrite the database.}
 
 \item{...}{Any other parameter to pass to \link[webhoser]{wh_news}.}
 }

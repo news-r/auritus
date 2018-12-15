@@ -11,6 +11,7 @@
 #' Preprocess results of webhose.io
 #' @param dat Data as returned by webhoser.
 .preproc_crawl <- function(dat){
+  dat$published <- webhoser.extension::whe_date(dat$published)
   dat$thread.published <- webhoser.extension::whe_date(dat$thread.published)
   dat$crawled <- webhoser.extension::whe_date(dat$crawled)
   return(dat)
@@ -53,9 +54,9 @@
       nm_text <- paste0(nm, "_text_segment")
       nm_1p <- paste0(nm, "_1p_segment")
 
-      data <- data %>% 
-        webhoser.extension::whe_search_1p(relevant_segments$regex[[i]], nm_1p) %>% 
-        webhoser.extension::whe_search(relevant_segments$regex[[i]], nm_title, "thread.title") %>% 
+      data <- data %>%
+        webhoser.extension::whe_search_1p(relevant_segments$regex[[i]], nm_1p) %>%
+        webhoser.extension::whe_search(relevant_segments$regex[[i]], nm_title, "thread.title") %>%
         webhoser.extension::whe_search(relevant_segments$regex[[i]], nm_text, "text")
     }
 
@@ -66,4 +67,38 @@
 
 "%||%" <- function(x, y) {
   if (length(x) > 0 || !is.null(x)) x else y
+}
+
+#' Get echarts4r theme
+.get_theme <- function(){
+  getOption("echarts4r_theme")
+}
+
+#' Get database setup
+.get_db <- function(){
+  getOption("database_settings")
+}
+
+.db_con <- function(db){
+  db$drv <- .type2drv(db$type)
+  db$type <- NULL # remove type before call
+  return(db)
+}
+
+#' Convert type to driver
+#' @param x a type as specified in \code{_auritus.yml}
+.type2drv <- function(x){
+
+  DRV <- NULL
+
+  if(x == "Postgres")
+    DRV <- RPostgres::Postgres()
+  else if (x == "MySQL")
+    DRV <- RMySQL::MySQL()
+  else if(x == "MariaDB")
+    DRV <- RMariaDB::MariaDB()
+  else if(x == "SQLite")
+    DRV <- RSQLite::SQLite()
+
+  return(DRV)
 }

@@ -10,15 +10,28 @@
 #' @param apply_segments If TRUE applies the \code{segments} from \code{_auritus.yml}.
 #' @param since_last If \code{TRUE} crawls data since the most recently published article in dataset (recommended). Only applies if \code{append} is \code{TRUE} (and data already exists).
 #' @param pause Time in seconds, to wait before crawling.
+#' @param overwrite Set to \code{TRUE} to overwrite the database.
 #' @param ... Any other parameter to pass to \link[webhoser]{wh_news}.
-#' 
+#'
 #' @name crawl
 #' @export
-crawl_data <- function(days = 30L, quiet = FALSE, pages = 3L, append = FALSE, 
-                          apply_segments = TRUE, since_last = TRUE, pause = 5, ...){
-  
+crawl_data <- function(days = 30L, quiet = FALSE, pages = 3L, append = FALSE,
+                          apply_segments = TRUE, since_last = TRUE, pause = 5, overwrite = FALSE, ...){
+
   config <- "_auritus.yml"
-  
+
+  if(isTRUE(overwrite)){
+    overwrite_answer <- "none"
+    while (!tolower(overwrite_answer) %in% "y" & !tolower(overwrite_answer) %in% "n") {
+      overwrite_answer <- readline(
+        cat("Do you really want to", crayon::underline("overwrite"), "your datatabse? (y/n)")
+      )
+    }
+
+    if(tolower(overwrite_answer) == "n")
+      return(NULL)
+  }
+
   if(!file.exists(config)){
     cat(
       crayon::red(cli::symbol$cross), "No", crayon::underline("_auritus.yml"), "configuration file."
@@ -57,7 +70,9 @@ crawl_data <- function(days = 30L, quiet = FALSE, pages = 3L, append = FALSE,
   # stop if no token present
   if(!"token" %in% settings_list){
     cat(crayon::red(cli::symbol$cross), "_auritus.yml is missing the required", crayon::underline("token"), "parameter!\n\n",
-        "Create one for", crayon::green("free"), "at", crayon::blue("webhoser.io"))
+        "Create one for", crayon::green("free"), "at", crayon::blue("webhose.io"))
+
+    Sys.sleep(1)
 
     if(interactive())
       browseURL("http://webhose.io/")
@@ -68,27 +83,48 @@ crawl_data <- function(days = 30L, quiet = FALSE, pages = 3L, append = FALSE,
   # initialise data
   articles <- data.frame()
 
-  dir <- "data"
-  if(!dir.exists(dir)){
-    cat(crayon::red(cli::symbol$cross), "No data folder present, see", crayon::underline("setup_auritus"), ".\n")
-    return(NULL)
-  }
-
   # check append __before__ running query to avoir waste
-  fl <- paste0(dir, "/articles.RData")
-  if(file.exists(fl)){
+  if(!"database" %in% settings_list){
 
-    if(!isTRUE(append)) {
-      cat(crayon::red(cli::symbol$cross), "Data file already exists, set the", crayon::underline("append"), "parameter to TRUE to add data to it.\n")
+    dir <- "data"
+    if(!dir.exists(dir)){
+      cat(crayon::red(cli::symbol$cross), "No data folder present, see", crayon::underline("setup_auritus"), ".\n")
       return(NULL)
-    } else {
-      cat(crayon::green(cli::symbol$tick), "Data file found, data will be appended.\n")
-      articles <- get(load(fl))
+    }
 
-      if(isTRUE(since_last)){
-        days <- max(articles$thread.published)
+    fl <- paste0(dir, "/articles.RData")
+    if(file.exists(fl)){
+
+      if(!isTRUE(append)) {
+        cat(crayon::red(cli::symbol$cross), "Data file already exists, set the", crayon::underline("append"), "parameter to TRUE to add data to it.\n")
+        return(NULL)
+      } else {
+        cat(crayon::green(cli::symbol$tick), "Data file found, data will be appended.\n")
+        articles <- get(load(fl))
+
+        if(isTRUE(since_last)){
+          days <- max(articles$published)
+        }
+
       }
 
+    }
+  } else {
+
+    # check connection
+    db <- settings$database
+    db$drv <- .type2drv(db$type)
+    db$type <- NULL # remove type before call
+
+
+    can_connect <- do.call(DBI::dbCanConnect, db)
+
+    if(!isTRUE(can_connect)){
+      cat(
+        crayon::red(cli::symbol$cross), " Cannot connect to the ", crayon::underline("database"), ", check your settings in ", crayon::underline("_auritus.yml"), ".\n",
+        sep = ""
+      )
+      return(NULL)
     }
 
   }
@@ -100,13 +136,13 @@ crawl_data <- function(days = 30L, quiet = FALSE, pages = 3L, append = FALSE,
     cat(crayon::yellow(cli::symbol$warning), "The following segments will be applied:\n")
     for(i in 1:nrow(segments)){
       cat(
-        cli::symbol$pointer, segments$name[i], "with regex", crayon::underline(segments$regex[i]), "applies to query", segments$query[i], "\n"
+        cli::symbol$pointer, segments$name[i], "with regex", crayon::underline(segments$regex[i]), "applies to query with id", segments$query[i], "\n"
       )
     }
 
     # give user a change to stop process
     cat(
-      crayon::yellow(cli::symbol$warning), "Hit", crayon::underline("CTRL + C"), "to cancel."
+      crayon::yellow(cli::symbol$warning), "Hit", crayon::underline("CTRL + C"), "to cancel.\n"
     )
     Sys.sleep(pause)
   }
@@ -120,6 +156,9 @@ crawl_data <- function(days = 30L, quiet = FALSE, pages = 3L, append = FALSE,
 
     q <- as.data.frame(settings$queries[[1]][[i]])
 
+    if(is.null(q$name))
+      q$name <- q$id
+
     query <- webhoser::wh_news(
       settings$token,
       q$search,
@@ -128,9 +167,10 @@ crawl_data <- function(days = 30L, quiet = FALSE, pages = 3L, append = FALSE,
       highlight = TRUE
     ) %>%
       webhoser::wh_paginate(pages) %>%
-      webhoser::wh_collect() %>%
+      webhoser::wh_collect(flatten = TRUE) %>%
       mutate(
-        query_id = q$id
+        query_id = q$id,
+        query_name = q$name
       )
 
     # dedupe
@@ -143,13 +183,21 @@ crawl_data <- function(days = 30L, quiet = FALSE, pages = 3L, append = FALSE,
       query <- .segment(query, segments, q$id[i])
     }
 
-    articles <- rbind.data.frame(articles, query)
+    articles <- plyr::rbind.fill(articles, query)
 
   }
 
   # save
-  save(articles, file = fl)
+  if(!"database" %in% settings_list){
+    save(articles, file = fl)
+  } else {
 
-  cat(crayon::green(cli::symbol$tick), nrow(articles), "articles in the bank.")
+    con <- do.call(DBI::dbConnect, db)
+    dbWriteTable(con, "articles", articles, append = append, overwrite = overwrite)
+    dbDisconnect(con)
+
+  }
+
+  cat(crayon::green(cli::symbol$tick), nrow(articles), "articles collected.")
 
 }

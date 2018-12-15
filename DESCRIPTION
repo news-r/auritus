@@ -7,20 +7,23 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports:
+  DBI,
   cli,
   yaml,
+  plyr,
   utils,
   shiny,
   dplyr,
   purrr,
   crayon,
-  bs4Dash,
   magrittr,
   webhoser,
   shinybulma,
-  shinythemes,
-  shinyWidgets,
   webhoser.extension
+Suggests:
+  RSQLite,
+  RMariaDB,
+  RPostgres,
 RoxygenNote: 6.1.1
 Remotes:
   JohnCoene/webhoser,
