@@ -5,15 +5,15 @@ homeUI <- function(id){
   ns <- NS(id)
   
   tagList(
-    div(
-      class = "container",
-      div(
-        class = "jumbotron",
-        h1("auritus", class = "auritus"),
-        br(),
-        p("Free, Open-source Media Monitoring Platform."),
-        br(),
-        actionButton(ns("overview"), "Overview", class = "btn-primary")
+    bulmaHero(
+      fullheight = TRUE,
+      color = "primary",
+      bulmaHeroBody(
+        bulmaContainer(
+          bulmaTitle("auritus"),
+          bulmaSubtitle("Free, Open-Source News Monitoring Platform."),
+          br()
+        )
       )
     )
   )

@@ -17,10 +17,12 @@ Imports:
   bs4Dash,
   magrittr,
   webhoser,
+  shinybulma,
   shinythemes,
   shinyWidgets,
   webhoser.extension
 RoxygenNote: 6.1.1
 Remotes:
   JohnCoene/webhoser,
+  RinteRface/shinybulma,
   JohnCoene/webhoser.extension

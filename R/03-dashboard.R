@@ -20,9 +20,9 @@ launch_auritus <- function(){
   if(!"theme" %in% names(settings[["style"]])){
     cat(
       crayon::yellow(cli::symbol$warning), "No theme set in _autitus.yml, defaulting to",
-      crayon::underline("paper.\n")
+      crayon::underline("materia.\n")
     )
-    theme <- "paper"
+    theme <- "materia"
   } else {
     theme <- settings[["style"]][["theme"]]
   }
@@ -40,13 +40,21 @@ launch_auritus <- function(){
   
   font_name <- gsub("[[:space:]]", "+", font)
   
-  ui <- navbarPage(
-    title = "auritus",
-    windowTitle = "auritus",
-    id = "navbarTabs",
-    inverse = settings[["style"]][["inverse"]] %||% FALSE,
-    theme = shinythemes::shinytheme(theme),
-    header = tagList(
+  ui <- bulmaPage(
+    theme = theme,
+    bulmaNavbar(
+      color = "primary",
+      bulmaNavbarBrand(
+        bulmaNavbarItem(
+          "auritus",
+          href = "Overview"
+        ),
+        bulmaNavbarBurger()
+      ),
+      bulmaNavbarMenu( 
+      )
+    ),
+    tags$head(
       tags$link(
         href = paste0("https://fonts.googleapis.com/css?family=", font_name),
         rel = "stylesheet"
@@ -55,9 +63,8 @@ launch_auritus <- function(){
         paste0("*{font-family: '", font, "', sans-serif;}")
       )
     ),
-    tabPanel(
-      "Home",
-      icon = icon("home"),
+    bulmaNav(
+      "Overview",
       homeUI("home")
     )
   )
