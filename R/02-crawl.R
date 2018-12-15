@@ -8,7 +8,7 @@
 #' 1 page of results = 1 query = 100 articles (you have 1,000 free queries per month).
 #' @param append If data has been previously crawled and stored, whether to append new results to it (set to \code{TRUE}).
 #' @param apply_segments If TRUE applies the \code{segments} from \code{_auritus.yml}.
-#' @param since_last If \code{TRUE} crawls data since the most recently published article in dataset (recommended). Only applies if \code{append} is \code{TRUE} (and data already exists).
+#' @param since_last If \code{TRUE} crawls data since the most recently crawled article in dataset (recommended). Only applies if \code{append} is \code{TRUE} (and data already exists).
 #' @param pause Time in seconds, to wait before crawling.
 #' @param overwrite Set to \code{TRUE} to overwrite the database.
 #' @param ... Any other parameter to pass to \link[webhoser]{wh_news}.
@@ -39,8 +39,6 @@ crawl_data <- function(days = 30L, quiet = FALSE, pages = 3L, append = FALSE,
     return(NULL)
   }
 
-  TS <- Sys.Date() - days
-
   if(pages <= 1){
     cat(crayon::yellow(cli::symbol$warning), "Minimum 2 pages of crawl, setting the pages parameter to", crayon::yellow("2."), "\n")
     pages <- 2
@@ -53,6 +51,8 @@ crawl_data <- function(days = 30L, quiet = FALSE, pages = 3L, append = FALSE,
     cat(crayon::yellow(cli::symbol$warning), "Maximum 30 days backcrawl available, setting it to", crayon::yellow("30."), "\n")
     days <- 30L
   }
+
+  TS <- Sys.Date() - days
 
   settings <- yaml::read_yaml(config)
   settings_list <- names(settings)
@@ -103,7 +103,8 @@ crawl_data <- function(days = 30L, quiet = FALSE, pages = 3L, append = FALSE,
         articles <- get(load(fl))
 
         if(isTRUE(since_last)){
-          days <- max(articles$published)
+          TS <- max(articles$crawled)
+          TS <- as.numeric(TS)
         }
 
       }
@@ -127,6 +128,17 @@ crawl_data <- function(days = 30L, quiet = FALSE, pages = 3L, append = FALSE,
       return(NULL)
     }
 
+    if(isTRUE(since_last)){
+      con <- do.call(DBI::dbCanConnect, db)
+      TS <- dbGetQuery(con, "SELECT MAX(crawled) FROM 'articles';")
+      dbDisconnect(con)
+
+      if(inherits(mx, "numeric"))
+        TS <- as.POSIXct(mx[[1]], origin = "1970-01-01 12:00")
+
+      TS <- as.numeric(TS)
+    }
+
   }
 
   if("segments" %in% settings_list){
@@ -142,7 +154,9 @@ crawl_data <- function(days = 30L, quiet = FALSE, pages = 3L, append = FALSE,
 
     # give user a change to stop process
     cat(
-      crayon::yellow(cli::symbol$warning), "Hit", crayon::underline("CTRL + C"), "to cancel.\n"
+      "\n",
+      crayon::yellow(cli::symbol$warning), " Hit ", crayon::underline("CTRL + C"), ", or ", crayon::underline("ESC"), " to cancel.\n",
+      sep = ""
     )
     Sys.sleep(pause)
   }
@@ -162,7 +176,7 @@ crawl_data <- function(days = 30L, quiet = FALSE, pages = 3L, append = FALSE,
     query <- webhoser::wh_news(
       settings$token,
       q$search,
-      ts = TS,
+      ts = as.numeric(TS),
       quiet = quiet,
       highlight = TRUE
     ) %>%

@@ -110,7 +110,7 @@ setup_auritus <- function(days = 30L, quiet = FALSE, pages = 3L){
             }
 
           } else {
-            cat(crayon::yellow(cli::symbol$warning), "Not crawling data, manually run", crayon::underline("initial-crawl"), "before launching auritus.\n")
+            cat(crayon::yellow(cli::symbol$warning), "Not crawling data, manually run your initial crawl with", crayon::underline("crawl_data"), "before launching auritus.\n")
 
             return(NULL)
           }

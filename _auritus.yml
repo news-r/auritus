@@ -14,19 +14,30 @@ token: "fd17174d-53ab-49d7-b19a-3351220490e7"
 queries:
   - wine:
     - id: 1
-    - name: "wine or champagne"
-    - search: '"wine" OR "champagne" is_first:true language:english site_type:news'
+    - name: "Yellow Tail"
+    - search: '("Yellow Tail" OR "Mateus$") AND "wine$" is_first:true language:english'
 
 # segments to categorise your data
+# regex:
+# | => OR
+# & => AND
 segments:
   - segment:
     - query: 1
-    - name: "Wine"
-    - regex: "wine|Wine"
+    - name: "Rosé"
+    - regex: "Rosé|rosé"
   - segment:
     - query: 1
-    - name: "Champagne"
-    - regex: "champagne|Champagne"
+    - name: "White"
+    - regex: "White|white"
+  - segment:
+    - query: 1
+    - name: "Red"
+    - regex: "Red|red"
+  - segment:
+    - query: 1
+    - name: "Bubbles"
+    - regex: "Bubbles"
 
 # analytics to track site usage
 analytics:

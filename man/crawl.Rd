@@ -21,7 +21,7 @@ crawl_data(days = 30L, quiet = FALSE, pages = 3L, append = FALSE,
 
 \item{apply_segments}{If TRUE applies the \code{segments} from \code{_auritus.yml}.}
 
-\item{since_last}{If \code{TRUE} crawls data since the most recently published article in dataset (recommended). Only applies if \code{append} is \code{TRUE} (and data already exists).}
+\item{since_last}{If \code{TRUE} crawls data since the most recently crawled article in dataset (recommended). Only applies if \code{append} is \code{TRUE} (and data already exists).}
 
 \item{pause}{Time in seconds, to wait before crawling.}
 

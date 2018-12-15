@@ -56,7 +56,7 @@ home <- function(input, output, session){
 
   max <- reactive({
 
-    if(DB == "local"){
+    if(length(DB) == 1){
       mx <- max(load_data()$published)
     } else {
       args <- .db_con(DB)
