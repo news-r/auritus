@@ -11,4 +11,7 @@
 
 # Free, Open-source Media Monitoring Platform.
 
+[GitHub](https://github.com/JohnCoene/auritus)
+[Get Started](guide)
+
 ![color](#f0f0f0)
