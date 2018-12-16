@@ -19,10 +19,10 @@ launch_auritus <- function(){
 
   if(!"theme" %in% names(settings[["style"]])){
     cat(
-      crayon::yellow(cli::symbol$warning), "No theme set in _autitus.yml, defaulting to",
-      crayon::underline("materia.\n")
+      crayon::yellow(cli::symbol$warning), "No theme set in _autitus.yml, setting to",
+      crayon::underline("default.\n")
     )
-    theme <- "materia"
+    theme <- "default"
   } else {
     theme <- settings[["style"]][["theme"]]
   }
@@ -58,7 +58,6 @@ launch_auritus <- function(){
   font_name <- gsub("[[:space:]]", "+", font)
 
   ui <- bulmaPage(
-    theme = theme,
     bulmaNavbar(
       color = "light",
       bulmaNavbarBrand(
@@ -81,6 +80,12 @@ launch_auritus <- function(){
       tags$link(
         href = paste0("https://fonts.googleapis.com/css?family=", font_name),
         rel = "stylesheet"
+      ),
+      tags$link(
+        rel = "stylesheet",
+        href = paste0(
+          "https://unpkg.com/bulmaswatch/", theme,"/bulmaswatch.min.css"
+        )
       ),
       tags$style(
         paste0("*{font-family: '", font, "', sans-serif;}")

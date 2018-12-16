@@ -54,7 +54,7 @@ The default configuration looks like this:
 
 ```yaml
 style:
-  theme: materia
+  theme: default
   font: Raleway 
   chart_theme: default 
 ```
@@ -169,3 +169,63 @@ tracking:
 ```
 
 Follow the structure given in the example above.
+
+## Defaults
+
+Below is the default setup.
+
+```yaml
+# theme
+style:
+  theme: default # from: https://jenil.github.io/bulmaswatch/
+  font: Raleway # google font
+  chart_theme: default # echarts4r theme, from: https://echarts4r.john-coene.com/articles/themes
+
+# your webhose token
+# free @ webhose.io
+token: "fd17174d-53ab-49d7-b19a-3351220490e7"
+
+# minimum setup = 1 query
+# each query MUST have an id and a search
+queries:
+  - wine:
+    - id: 1
+    - name: "Yellow Tail"
+    - search: '("Yellow Tail" OR "Mateus$") AND "wine$" is_first:true language:english'
+
+# segments to categorise your data
+# regex:
+# | => OR
+# & => AND
+segments:
+  - segment:
+    - query: 1
+    - name: "Rosé"
+    - regex: "Rosé|rosé"
+  - segment:
+    - query: 1
+    - name: "White"
+    - regex: "White|white"
+  - segment:
+    - query: 1
+    - name: "Red"
+    - regex: "Red|red"
+  - segment:
+    - query: 1
+    - name: "Bubbles"
+    - regex: "Bubbles"
+
+# analytics to track site usage
+tracking:
+  ganalytics: UA-12345-6
+  hotjar: 12345
+
+
+# database
+# must include type
+# must include dbname
+# Any other option to pass to DBI::dbConnect
+database:
+  type: "SQLite"
+  dbname: "articles"
+```

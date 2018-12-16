@@ -1,8 +1,8 @@
 # theme
 style:
-  theme: dark # from: https://jenil.github.io/bulmaswatch/
+  theme: default # from: https://jenil.github.io/bulmaswatch/
   font: Raleway # google font
-  chart_theme: chalk # echarts4r theme, from: https://echarts4r.john-coene.com/articles/themes
+  chart_theme: default # echarts4r theme, from: https://echarts4r.john-coene.com/articles/themes
 
 # your webhose token
 # free @ webhose.io
