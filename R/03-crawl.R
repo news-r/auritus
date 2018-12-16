@@ -16,7 +16,7 @@
 #' @name crawl
 #' @export
 crawl_data <- function(days = 30L, quiet = FALSE, pages = 3L, append = FALSE,
-                          apply_segments = TRUE, since_last = TRUE, pause = 5, overwrite = FALSE, ...){
+                       apply_segments = TRUE, since_last = TRUE, pause = 5, overwrite = FALSE, ...){
 
   config <- "_auritus.yml"
 
@@ -100,11 +100,12 @@ crawl_data <- function(days = 30L, quiet = FALSE, pages = 3L, append = FALSE,
         return(NULL)
       } else {
         cat(crayon::green(cli::symbol$tick), "Data file found, data will be appended.\n")
-        articles <- get(load(fl))
 
         if(isTRUE(since_last)){
-          TS <- max(articles$crawled)
+          current <- get(load(fl))
+          TS <- max(current$crawled)
           TS <- as.numeric(TS)
+          rm(current)
         }
 
       }
@@ -129,14 +130,18 @@ crawl_data <- function(days = 30L, quiet = FALSE, pages = 3L, append = FALSE,
     }
 
     if(isTRUE(since_last)){
-      con <- do.call(DBI::dbCanConnect, db)
-      TS <- dbGetQuery(con, "SELECT MAX(crawled) FROM 'articles';")
+      con <- do.call(DBI::dbConnect, db)
+      ts_query <- tryCatch(
+        dbGetQuery(con, "SELECT MAX(crawled) FROM 'articles';"),
+        error = function(e) e
+      )
       dbDisconnect(con)
 
-      if(inherits(mx, "numeric"))
-        TS <- as.POSIXct(mx[[1]], origin = "1970-01-01 12:00")
+      if(inherits(ts_query, "numeric"))
+        ts_query <- as.POSIXct(ts_query[[1]], origin = "1970-01-01 12:00")
 
-      TS <- as.numeric(TS)
+      if(!inherits(ts_query, "error"))
+        TS <- as.numeric(ts_query)
     }
 
   }
@@ -145,7 +150,7 @@ crawl_data <- function(days = 30L, quiet = FALSE, pages = 3L, append = FALSE,
 
     segments <- .segments2df(settings)
 
-    cat(crayon::yellow(cli::symbol$warning), "The following segments will be applied:\n")
+    cat(crayon::yellow(cli::symbol$warning), "The following segments will be applied:\n\n")
     for(i in 1:nrow(segments)){
       cat(
         cli::symbol$pointer, segments$name[i], "with regex", crayon::underline(segments$regex[i]), "applies to query with id", segments$query[i], "\n"
@@ -201,9 +206,35 @@ crawl_data <- function(days = 30L, quiet = FALSE, pages = 3L, append = FALSE,
 
   }
 
+  # rename
+  names(articles) <- gsub("\\.", "_", names(articles))
+
   # save
   if(!"database" %in% settings_list){
+    text <- tibble(
+      uuid = articles$uuid,
+      text = articles$text
+    )
+
+    articles$text <- NULL
+
+    if(isTRUE(append)){
+
+      # articles bind
+      current_articles <- articles
+      articles <- get_articles()
+      articles <- plyr::rbind.fill(articles, current_articles)
+
+      # text bind
+      current_text <- text
+      text <- get_text()
+      text <- plyr::rbind.fill(text, current_text)
+
+      rm(current_text, current_articles)
+    }
+
     save(articles, file = fl)
+    save(text, file = paste0(dir, "/text.RData"))
   } else {
 
     con <- do.call(DBI::dbConnect, db)

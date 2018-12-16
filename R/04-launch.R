@@ -50,12 +50,52 @@ launch_auritus <- function(){
   }
 
   options(
-    echarts4r_theme = echarts4r_theme, 
+    echarts4r_theme = echarts4r_theme,
     database_settings = settings$database %||% "local",
     font = font
   )
 
   font_name <- gsub("[[:space:]]", "+", font)
+
+  # head
+  head <- tagList(
+    tags$link(
+      href = paste0("https://fonts.googleapis.com/css?family=", font_name),
+      rel = "stylesheet"
+    ),
+    tags$link(
+      rel = "stylesheet",
+      href = paste0(
+        "https://unpkg.com/bulmaswatch/", theme,"/bulmaswatch.min.css"
+      )
+    ),
+    tags$style(
+      paste0("*{font-family: '", font, "', sans-serif;}")
+    )
+  )
+
+  # add google analytics if present
+  if("ganalytics" %in% names(settings$tracking)){
+
+    ga_id <- settings$tracking$ganalytics
+
+    ga_tag <- tagList(
+      tags$script(
+        async = NA,
+        src = paste0("https://www.googletagmanager.com/gtag/js?id={{", ga_id, "}}")
+      ),
+      tags$script(
+        paste0(
+          "window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', '{{", ga_id, "}}');"
+        )
+      )
+    )
+
+    head <- tagAppendChild(head, ga_tag)
+  }
 
   ui <- bulmaPage(
     bulmaNavbar(
@@ -76,21 +116,7 @@ launch_auritus <- function(){
         )
       )
     ),
-    tags$head(
-      tags$link(
-        href = paste0("https://fonts.googleapis.com/css?family=", font_name),
-        rel = "stylesheet"
-      ),
-      tags$link(
-        rel = "stylesheet",
-        href = paste0(
-          "https://unpkg.com/bulmaswatch/", theme,"/bulmaswatch.min.css"
-        )
-      ),
-      tags$style(
-        paste0("*{font-family: '", font, "', sans-serif;}")
-      )
-    ),
+    tags$head(head),
     bulmaNav(
       "Home",
       homeUI("home")

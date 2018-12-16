@@ -1,0 +1,52 @@
+# theme
+style:
+  theme: default # from: https://jenil.github.io/bulmaswatch/
+  font: Raleway # google font
+  chart_theme: default # echarts4r theme, from: https://echarts4r.john-coene.com/articles/themes
+
+# your webhose token
+# free @ webhose.io
+token: null
+
+# minimum setup = 1 query
+# each query MUST have an id and a search
+queries:
+  - myQuery:
+    - id: 1
+    - name: "My Query"
+    - search: null
+
+# analytics to track site usage
+# replace or delete
+tracking:
+  ganalytics: "UA-74544116-1"
+  hotjar: null
+
+
+# segments to categorise your data
+# regex:
+# | => OR
+# & => AND
+# delete or replace this
+segments:
+  - segment:
+    - query: 1
+    - name: "First Segment"
+    - regex: null
+  - segment:
+    - query: 1
+    - name: "Second Segment"
+    - regex: null
+
+# analytics to track site usage
+tracking:
+  ganalytics: "UA-12345-6"
+
+# database
+# must include type
+# must include dbname
+# Any other option to pass to DBI::dbConnect
+# delete this to use local files instead
+database:
+  type: "SQLite"
+  dbname: "articles"

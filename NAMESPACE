@@ -2,8 +2,10 @@
 
 export("%>%")
 export(crawl_data)
+export(get_articles)
+export(get_text)
+export(init_auritus)
 export(launch_auritus)
-export(load_data)
 export(segment_data)
 export(setup_auritus)
 import(DBI)

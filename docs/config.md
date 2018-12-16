@@ -65,6 +65,7 @@ A [bulmaswatch](https://jenil.github.io/bulmaswatch/) theme name:
 
 - `cerulean`
 - `cyborg`
+- `cosmo`
 - `dark`
 - `darkly`
 - `default`
@@ -82,12 +83,13 @@ A [bulmaswatch](https://jenil.github.io/bulmaswatch/) theme name:
 - `slate`
 - `solar`
 - `spacelab`
+- `superhero`
 - `united`
 - `yeti`
 
 ### Font
 
-A [Google Fonts](https://fonts.google.com/) name, defaults to `Raleway`.
+A [Google Fonts](https://fonts.google.com/) name, defaults to `Raleway`. Note that the font will apply to the entirety of the dashboard, including the charts.
 
 ### Chart theme
 
@@ -158,21 +160,20 @@ Follow the structure given in the example above.
 
 ## Tracking
 
-This is where you can specify your web tracking codes. auritus supports [Google Analytics]() and [Hotjar]().
+This is where you can specify your web tracking codes. auritus supports [Google Analytics](http://analytics.google.com).
 
 ### Example
 
 ```yaml
 tracking:
-  ganalytics: UA-12345-6
-  hotjar: 12345
+  ganalytics: "UA-12345-6"
 ```
 
 Follow the structure given in the example above.
 
 ## Defaults
 
-Below is the default setup.
+Below is the default setup _where defaults can be used_.
 
 ```yaml
 # theme
@@ -217,9 +218,7 @@ segments:
 
 # analytics to track site usage
 tracking:
-  ganalytics: UA-12345-6
-  hotjar: 12345
-
+  ganalytics: "UA-12345-6"
 
 # database
 # must include type

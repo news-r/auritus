@@ -2,15 +2,18 @@
 % Please edit documentation in R/helpers.R
 \name{load}
 \alias{load}
-\alias{load_data}
+\alias{get_articles}
+\alias{get_text}
 \title{Load data}
 \usage{
-load_data()
+get_articles()
+
+get_text()
 }
 \description{
 Load data collected with \code{\link{crawl_data}} or \code{\link{setup_auritus}}.
 }
 \examples{
-\dontrun{data <- load_data()}
+\dontrun{data <- get_articles()}
 
 }

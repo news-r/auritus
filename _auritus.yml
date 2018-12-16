@@ -1,8 +1,8 @@
 # theme
 style:
-  theme: default # from: https://jenil.github.io/bulmaswatch/
+  theme: materia # from: https://jenil.github.io/bulmaswatch/
   font: Raleway # google font
-  chart_theme: default # echarts4r theme, from: https://echarts4r.john-coene.com/articles/themes
+  chart_theme: infographic # echarts4r theme, from: https://echarts4r.john-coene.com/articles/themes
 
 # your webhose token
 # free @ webhose.io
@@ -13,8 +13,8 @@ token: "fd17174d-53ab-49d7-b19a-3351220490e7"
 queries:
   - wine:
     - id: 1
-    - name: "Yellow Tail"
-    - search: '("Yellow Tail" OR "Mateus$") AND "wine$" is_first:true language:english'
+    - name: "Wine Brands"
+    - search: '("Woodbridge$" OR "Sutter Home" OR "Barefoot$") AND ("wine$" OR "champagne$" OR "mousseux$") is_first:true language:english'
 
 # segments to categorise your data
 # regex:
@@ -24,7 +24,7 @@ segments:
   - segment:
     - query: 1
     - name: "Rosé"
-    - regex: "Rosé|rosé"
+    - regex: "Rosé|rosé|rose|Rose"
   - segment:
     - query: 1
     - name: "White"
@@ -36,18 +36,17 @@ segments:
   - segment:
     - query: 1
     - name: "Bubbles"
-    - regex: "Bubbles"
+    - regex: "Bubbles|bubbles|Champagne|champagne|Mousseux|mousseux|sparkling|Sparling"
 
 # analytics to track site usage
 tracking:
-  ganalytics: 12345
-  hotjar: 12345
+  ganalytics: "UA-12345-6"
 
 
 # database
 # must include type
 # must include dbname
 # Any other option to pass to DBI::dbConnect
-# database:
-#   type: "SQLite"
-#   dbname: "articles"
+database:
+  type: "SQLite"
+  dbname: "articles"
