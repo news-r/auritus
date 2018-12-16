@@ -54,19 +54,22 @@ home <- function(input, output, session){
 
   DB <- .get_db()
 
-  max <- reactive({
+  latest <- reactive({
 
     if(length(DB) == 1){
-      mx <- max(load_data()$published)
+      
+      dat <- load_data()
+      
+      mx <- max(dat$published)
     } else {
       args <- .db_con(DB)
       con <- do.call(dbConnect, args)
       mx <- dbGetQuery(con, "SELECT MAX(published) FROM 'articles';")
       dbDisconnect(con)
+      
+      if(inherits(mx[[1]], "numeric"))
+        mx <- as.POSIXct(mx[[1]], origin = "1970-01-01 12:00")
     }
-
-    if(inherits(mx, "numeric"))
-      mx <- as.POSIXct(mx[[1]], origin = "1970-01-01 12:00")
 
     return(mx)
 
@@ -77,7 +80,7 @@ home <- function(input, output, session){
     p(
       class = "is-pulled-right",
       "Most recent article in the bank was published",
-      format(mx, "%d %B %Y")
+      format(latest(), "%d %B %Y")
     )
   })
 

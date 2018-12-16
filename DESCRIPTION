@@ -15,6 +15,7 @@ Imports:
   shiny,
   dplyr,
   purrr,
+  tippy,
   crayon,
   magrittr,
   webhoser,

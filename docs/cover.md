@@ -1,4 +1,4 @@
-<img src='logo.png' width = "50%"/>
+<img src='logo.png' width = "70%"/>
 
 <br/>
 <br/>
@@ -9,6 +9,6 @@
 <br/>
 <br/>
 
-# Free, Open-source Public Relations Analytics Platform.
+# Free, Open-source Media Monitoring Platform.
 
 ![color](#f0f0f0)

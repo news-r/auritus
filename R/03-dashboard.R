@@ -49,7 +49,11 @@ launch_auritus <- function(){
     echarts4r_theme <- settings[["style"]][["chart_theme"]]
   }
 
-  options(echarts4r_theme = echarts4r_theme, database_settings = settings$database %||% "local")
+  options(
+    echarts4r_theme = echarts4r_theme, 
+    database_settings = settings$database %||% "local",
+    font = font
+  )
 
   font_name <- gsub("[[:space:]]", "+", font)
 

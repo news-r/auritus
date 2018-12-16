@@ -1,0 +1,2 @@
+* [Home](/)
+* [Config](config.md)

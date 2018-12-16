@@ -8,10 +8,12 @@
 #'
 #' @importFrom utils browseURL
 #' @import DBI
+#' @import tippy
 #' @import shiny
 #' @import dplyr
-#' @import shinybulma
 #' @import echarts4r
+#' @import shinybulma
+#' 
 #' @export
 setup_auritus <- function(days = 30L, quiet = FALSE, pages = 3L){
 
@@ -48,8 +50,8 @@ setup_auritus <- function(days = 30L, quiet = FALSE, pages = 3L){
     cat(crayon::yellow(cli::symbol$warning), "_auritus.yml does not contain", crayon::underline("segments."), "\n")
 
   # warn if no analytics
-  if(!"analytics" %in% settings_list)
-    cat(crayon::yellow(cli::symbol$warning), "_auritus.yml does not contain any", crayon::underline("analytics"), "tracking service.\n")
+  if(!"tracking" %in% settings_list)
+    cat(crayon::yellow(cli::symbol$warning), "_auritus.yml does not contain any web", crayon::underline("tracking"), "service.\n")
 
   # warn if no database
   if(!"database" %in% settings_list){

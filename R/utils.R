@@ -79,10 +79,16 @@
   getOption("database_settings")
 }
 
+#' Get Connection settings
 .db_con <- function(db){
   db$drv <- .type2drv(db$type)
   db$type <- NULL # remove type before call
   return(db)
+}
+
+#' Get font
+.font <- function(){
+  getOption("font")
 }
 
 #' Convert type to driver
