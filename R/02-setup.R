@@ -46,6 +46,12 @@ setup_auritus <- function(days = 30L, quiet = FALSE, pages = 3L){
     return(NULL)
   }
 
+  if(is.null(settings$token)){
+    cat(
+      crayon::red(cli::symbol$cross), " No token specified in ", crayon::underline("_auritus.yml"), ".\n", sep = ""
+    )
+  }
+
   # warn if no segment
   if(!"segments" %in% settings_list)
     cat(crayon::yellow(cli::symbol$warning), "_auritus.yml does not contain", crayon::underline("segments."), "\n")

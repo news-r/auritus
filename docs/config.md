@@ -134,6 +134,8 @@ Follow the structure given in the example above.
 
 This is where you define, _optional_, segments. This segments allow you the essentially categorise your data based on a regular expression. The regular expression is passed the R function `grep`, make sure it is valid.
 
+The `query` parameter refers to the id the `query` to apply the segment to.
+
 ### Example
 
 ```yaml
@@ -184,7 +186,7 @@ style:
 
 # your webhose token
 # free @ webhose.io
-token: "fd17174d-53ab-49d7-b19a-3351220490e7"
+token: "xx12484x-13xx-29x1-x12x-9725382618x1"
 
 # minimum setup = 1 query
 # each query MUST have an id and a search
