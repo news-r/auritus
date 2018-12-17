@@ -2,7 +2,7 @@
 style:
   theme: paper # from: https://rstudio.github.io/shinythemes/
   font: Raleway # google font
-  chart_theme: infographic # echarts4r theme, from: https://echarts4r.john-coene.com/articles/themes
+  chart_theme: default # echarts4r theme, from: https://echarts4r.john-coene.com/articles/themes
   inverse: false # Whether to use inverse navbar (Bootstrap 3)
 
 # your webhose token

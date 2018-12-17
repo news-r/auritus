@@ -11,14 +11,14 @@ displayUI <- function(id){
 
 }
 
-display <- function(input, output, session, heading, value, tooltip){
+display <- function(input, output, session, heading, react, tooltip){
 
   output$heading <- renderUI({
     h5(heading, style = "text-align:center;")
   })
 
-  output$value <- countup::renderCountup({
-    countup::countup(value, duration = 3)
+  output$value <- countup::renderUI({
+    countup::countup(react, duration = 3)
   })
 
   output$tip <- renderTippy({

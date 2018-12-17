@@ -98,12 +98,14 @@ launch_auritus <- function(){
     head <- tagAppendChild(head, ga_tag)
   }
 
-  pool <- NULL
   if("database" %in% settings_list){
     db <- settings$database
     db$drv <- .type2drv(db$type)
     db$type <- NULL # remove type before call
     pool <- do.call(pool::dbPool, db)
+  } else {
+    msg <- cat(crayon::red(cli::symbol$cross), "_auritus.yml has no ", crayon::underline("database"), " specified.\n", sep = "")
+    return(msg)
   }
 
   onStop(function() {

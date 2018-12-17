@@ -48,15 +48,10 @@ overview <- function(input, output, session, pool){
 
     ns <- session$ns
 
-    if(is.null(pool)){
-      range <- range(get_articles()$published)
-    } else {
-      query <- "SELECT MIN(published) AS min, MAX(published) AS max FROM articles;"
-      range <- dbGetQuery(pool, query) %>%
-        unname() %>%
-        unlist()
-
-    }
+    query <- "SELECT MIN(published) AS min, MAX(published) AS max FROM articles;"
+    range <- dbGetQuery(pool, query) %>%
+      unname() %>%
+      unlist()
 
     range <- as.Date(range)
 
@@ -65,34 +60,20 @@ overview <- function(input, output, session, pool){
 
   n_articles <- reactive({
 
-    ns <- session$ns
     req(input$daterangeOut)
 
     dates <- input$daterangeOut
-    print(dates)
 
-    if(is.null(pool)){
+    query <- "SELECT COUNT(uuid) AS n FROM articles"
 
-      N <- get_articles() %>%
-        filter(
-          published >= dates[1] && published <= dates[2]
-        ) %>%
-        nrow()
+    date_query <- paste0(
+      "WHERE published >= '", dates[1], " 00:00:00' AND published <= '", dates[2], " 23:59:59';"
+    )
 
-    } else {
+    query <- paste(query, date_query)
 
-      query <- "SELECT COUNT(uuid) AS n FROM articles"
-
-      date_query <- paste0(
-        "WHERE published >= '", dates[1], " 00:00:00' AND published <= '", dates[2], " 23:59:59';"
-      )
-
-      query <- paste(query, date_query)
-
-      N <- dbGetQuery(pool, query) %>%
-        pull(n)
-
-    }
+    N <- dbGetQuery(pool, query) %>%
+      pull(n)
 
     return(N)
 
@@ -100,15 +81,9 @@ overview <- function(input, output, session, pool){
 
   n_outlets <- reactive({
 
-    if(is.null(pool)){
-
-      N <- length(unique(get_articles()$thread_site))
-
-    } else {
-      query <- "SELECT thread_site, COUNT(DISTINCT thread_site) AS n FROM articles;"
-      N <- dbGetQuery(pool, query) %>%
-        pull(n)
-    }
+    query <- "SELECT thread_site, COUNT(DISTINCT thread_site) AS n FROM articles;"
+    N <- dbGetQuery(pool, query) %>%
+      pull(n)
 
     return(N)
   })
@@ -123,40 +98,21 @@ overview <- function(input, output, session, pool){
 
   country <- reactive({
 
-    if(is.null(pool)){
-      country <- get_articles()
-
-      country <- country %>%
-        count(thread_country, sort = T) %>%
-        filter(thread_country != "")
-    } else {
-      query <- "SELECT thread_country, COUNT(thread_country) AS n FROM articles WHERE thread_country <> '' GROUP BY thread_country ORDER BY count(thread_country) DESC;"
-      country <- dbGetQuery(pool, query)
-    }
-
-    country %>%
+    query <- "SELECT thread_country, COUNT(thread_country) AS n FROM articles WHERE thread_country <> '' GROUP BY thread_country ORDER BY count(thread_country) DESC;"
+    country <- dbGetQuery(pool, query) %>%
       e_country_names(thread_country, thread_country)
 
   })
 
   trend_data <- reactive({
 
-    if(is.null(pool)){
+    dates <- dbGetQuery(pool, "SELECT published FROM 'articles';")
 
-      res <- get_articles() %>%
-        mutate(published = as.Date(published))
-
-    } else {
-      dates <- dbGetQuery(pool, "SELECT published FROM 'articles';")
-
-      res <- dates %>%
-        mutate(
-          published = as.POSIXct(published, origin = "1970-01-01"),
-          published = as.Date(published)
-        )
-    }
-
-    res %>%
+    res <- dates %>%
+      mutate(
+        published = as.POSIXct(published, origin = "1970-01-01"),
+        published = as.Date(published)
+      ) %>%
       count(published)
 
   })

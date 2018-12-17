@@ -4,7 +4,7 @@ All the configuration lives in one place: `_auritus.yml`.
 
 ## Database
 
-This is an important option which allow you to make use of a database to store the data, it is much recommeded if you expect a large amount of new coverage for your queries. If omitted the function `setup_auritus` will prompt your to create a `data` directory where the data will be stored in a single file.
+This is a _required_ option which lets you to make use of a database to store the data. If omitted the function `setup_auritus` will fail and prompt you to specify one.
 
 Currently, auritus supports:
 
@@ -40,6 +40,7 @@ A Postgres database
 database:
   type: Postgres
   dbname: auritus
+  host: ":memory:"
   user: postgres
   password: 123456
 ```
@@ -57,31 +58,29 @@ style:
   theme: default
   font: Raleway 
   chart_theme: default 
+  inverse: fasle
 ```
+
+### Inverse
+
+Whether to use an inverse navbar (Bootstrap 3), defaults to `FALSE`.
 
 ### Theme
 
-A [bulmaswatch](https://jenil.github.io/bulmaswatch/) theme name:
+A Shiny [theme](https://rstudio.github.io/shinythemes/) name:
 
 - `cerulean`
-- `cyborg`
 - `cosmo`
-- `dark`
+- `cyborg`
 - `darkly`
-- `default`
 - `flatly`
 - `journal`
-- `litera`
 - `lumen`
-- `lux`
-- `materia` (default)
-- `minty`
-- `nuclear`
-- `pulse`
+- `paper` (default)
+- `readble`
 - `sandstone`
 - `simplex`
 - `slate`
-- `solar`
 - `spacelab`
 - `superhero`
 - `united`
@@ -95,7 +94,7 @@ A [Google Fonts](https://fonts.google.com/) name, defaults to `Raleway`. Note th
 
 An [echarts4r theme name](https://echarts4r.john-coene.com/articles/themes.html):
 
-- `default`
+- `default` (default)
 - `dark`
 - `vintage`
 - `westeros`
@@ -175,14 +174,15 @@ Follow the structure given in the example above.
 
 ## Defaults
 
-Below is the default setup _where defaults can be used_.
+Below is the default setup _where defaults can be used._
 
 ```yaml
 # theme
 style:
-  theme: default # from: https://jenil.github.io/bulmaswatch/
+  theme: paper # from: https://rstudio.github.io/shinythemes/
   font: Raleway # google font
   chart_theme: default # echarts4r theme, from: https://echarts4r.john-coene.com/articles/themes
+  inverse: false # Whether to use inverse navbar (Bootstrap 3)
 
 # your webhose token
 # free @ webhose.io

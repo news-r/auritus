@@ -51,32 +51,17 @@ homeUI <- function(id){
 
 home <- function(input, output, session, pool){
 
-  DB <- .get_db()
-
-  latest <- reactive({
-
-    if(is.null(pool)){
-
-      dat <- get_articles()
-
-      mx <- max(dat$published)
-    } else {
-      mx <- dbGetQuery(pool, "SELECT MAX(published) FROM 'articles';") %>%
-        unlist() %>%
-        unname() %>%
-        as.Date()
-    }
-
-    return(mx)
-
-  })
-
   output$recent <- renderUI({
+
+    latest <- dbGetQuery(pool, "SELECT MAX(published) FROM 'articles';") %>%
+      unlist() %>%
+      unname() %>%
+      as.Date()
 
     h4(
       class = "pull-right",
       "Latest article was published on",
-      format(latest(), "%d %B %Y")
+      format(latest, "%d %B %Y")
     )
   })
 

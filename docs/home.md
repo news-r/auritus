@@ -11,4 +11,4 @@ auritus is an open-source, freely available platform to collect, analyse and vis
 - Comprehensive
 - Customisable
 
-auritus is written in R and relies on [webhose.io](https://webhose.io/) for the data, [shinybulma](https://github.com/RinteRface/shinybulma) for the front-end, and [echarts4r](https://echarts4r.john-coene.com/) for the visualisations.
+auritus is written in R and relies on [webhose.io](https://webhose.io/) for the data, the dashboard is built with [Shiny](https://shiny.rstudio.com/), and the visualisations with [echarts4r](https://echarts4r.john-coene.com/).

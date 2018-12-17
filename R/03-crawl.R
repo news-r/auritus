@@ -33,10 +33,10 @@ crawl_data <- function(days = 30L, quiet = FALSE, pages = 50L, append = FALSE,
   }
 
   if(!file.exists(config)){
-    cat(
+    msg <- cat(
       crayon::red(cli::symbol$cross), "No", crayon::underline("_auritus.yml"), "configuration file."
     )
-    return(NULL)
+    return(msg)
   }
 
   if(pages <= 1){
@@ -59,8 +59,8 @@ crawl_data <- function(days = 30L, quiet = FALSE, pages = 50L, append = FALSE,
 
   # stop if no query present
   if(!"queries" %in% settings_list){
-    cat(crayon::red(cli::symbol$cross), "_auritus.yml is missing the required", crayon::underline("queries"), "parameter!\n")
-    return(NULL)
+    msg <- cat(crayon::red(cli::symbol$cross), "_auritus.yml is missing the required", crayon::underline("queries"), "parameter!\n")
+    return(msg)
   }
 
   if(length(settings$queries[[1]]) == 0){
@@ -69,7 +69,7 @@ crawl_data <- function(days = 30L, quiet = FALSE, pages = 50L, append = FALSE,
 
   # stop if no token present
   if(!"token" %in% settings_list){
-    cat(crayon::red(cli::symbol$cross), "_auritus.yml is missing the required", crayon::underline("token"), "parameter!\n\n",
+    msg <- cat(crayon::red(cli::symbol$cross), "_auritus.yml is missing the required", crayon::underline("token"), "parameter!\n\n",
         "Create one for", crayon::green("free"), "at", crayon::blue("webhose.io"))
 
     Sys.sleep(1)
@@ -77,73 +77,40 @@ crawl_data <- function(days = 30L, quiet = FALSE, pages = 50L, append = FALSE,
     if(interactive())
       browseURL("http://webhose.io/")
 
-    return(NULL)
+    return(msg)
   }
 
   # initialise data
   articles <- data.frame()
 
-  # check append __before__ running query to avoir waste
-  if(!"database" %in% settings_list){
+  # check connection
+  db <- settings$database
+  db$drv <- .type2drv(db$type)
+  db$type <- NULL # remove type before call
 
-    dir <- "data"
-    if(!dir.exists(dir)){
-      cat(crayon::red(cli::symbol$cross), "No data folder present, see", crayon::underline("setup_auritus"), ".\n")
-      return(NULL)
-    }
+  can_connect <- do.call(DBI::dbCanConnect, db)
 
-    fl <- paste0(dir, "/articles.RData")
-    if(file.exists(fl)){
+  if(!isTRUE(can_connect)){
+    msg <- cat(
+      crayon::red(cli::symbol$cross), " Cannot connect to the ", crayon::underline("database"), ", check your settings in ", crayon::underline("_auritus.yml"), ".\n",
+      sep = ""
+    )
+    return(msg)
+  }
 
-      if(!isTRUE(append)) {
-        cat(crayon::red(cli::symbol$cross), "Data file already exists, set the", crayon::underline("append"), "parameter to TRUE to add data to it.\n")
-        return(NULL)
-      } else {
-        cat(crayon::green(cli::symbol$tick), "Data file found, data will be appended.\n")
+  if(isTRUE(since_last)){
+    con <- do.call(DBI::dbConnect, db)
+    ts_query <- tryCatch(
+      dbGetQuery(con, "SELECT MAX(crawled) FROM 'articles';"),
+      error = function(e) e
+    )
+    dbDisconnect(con)
 
-        if(isTRUE(since_last)){
-          current <- get(load(fl))
-          TS <- max(current$crawled)
-          TS <- as.numeric(TS)
-          rm(current)
-        }
+    if(inherits(ts_query, "numeric"))
+      ts_query <- as.POSIXct(ts_query[[1]], origin = "1970-01-01 12:00")
 
-      }
-
-    }
-  } else {
-
-    # check connection
-    db <- settings$database
-    db$drv <- .type2drv(db$type)
-    db$type <- NULL # remove type before call
-
-
-    can_connect <- do.call(DBI::dbCanConnect, db)
-
-    if(!isTRUE(can_connect)){
-      cat(
-        crayon::red(cli::symbol$cross), " Cannot connect to the ", crayon::underline("database"), ", check your settings in ", crayon::underline("_auritus.yml"), ".\n",
-        sep = ""
-      )
-      return(NULL)
-    }
-
-    if(isTRUE(since_last)){
-      con <- do.call(DBI::dbConnect, db)
-      ts_query <- tryCatch(
-        dbGetQuery(con, "SELECT MAX(crawled) FROM 'articles';"),
-        error = function(e) e
-      )
-      dbDisconnect(con)
-
-      if(inherits(ts_query, "numeric"))
-        ts_query <- as.POSIXct(ts_query[[1]], origin = "1970-01-01 12:00")
-
-      if(!inherits(ts_query, "error"))
-        TS <- as.numeric(ts_query)
-    }
-
+    if(!inherits(ts_query, "error"))
+      TS <- as.numeric(ts_query)
   }
 
   if("segments" %in% settings_list){
@@ -209,49 +176,20 @@ crawl_data <- function(days = 30L, quiet = FALSE, pages = 50L, append = FALSE,
   # rename
   names(articles) <- gsub("\\.", "_", names(articles))
 
-  # save
-  if(!"database" %in% settings_list){
-    text <- tibble(
-      uuid = articles$uuid,
-      text = articles$text
-    )
 
-    articles$text <- NULL
-
-    if(isTRUE(append)){
-
-      # articles bind
-      current_articles <- articles
-      articles <- get_articles()
-      articles <- plyr::rbind.fill(articles, current_articles)
-
-      # text bind
-      current_text <- text
-      text <- get_text()
-      text <- plyr::rbind.fill(text, current_text)
-
-      rm(current_text, current_articles)
-    }
-
-    save(articles, file = fl)
-    save(text, file = paste0(dir, "/text.RData"))
-  } else {
-
-    # dates as strings if SQLite
-    if(settings$database$type == "SQLite"){
-      articles <- articles %>%
-        mutate(
-          published = as.character(published),
-          thread_published = as.character(thread_published),
-          crawled = as.character(crawled)
-        )
-    }
-
-    con <- do.call(DBI::dbConnect, db)
-    dbWriteTable(con, "articles", articles, append = append, overwrite = overwrite)
-    dbDisconnect(con)
-
+  # dates as strings if SQLite
+  if(settings$database$type == "SQLite"){
+    articles <- articles %>%
+      mutate(
+        published = as.character(published),
+        thread_published = as.character(thread_published),
+        crawled = as.character(crawled)
+      )
   }
+
+  con <- do.call(DBI::dbConnect, db)
+  dbWriteTable(con, "articles", articles, append = append, overwrite = overwrite)
+  dbDisconnect(con)
 
   cat(crayon::green(cli::symbol$tick), nrow(articles), "articles collected.")
 
