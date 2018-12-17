@@ -20,9 +20,9 @@ launch_auritus <- function(){
   if(!"theme" %in% names(settings[["style"]])){
     cat(
       crayon::yellow(cli::symbol$warning), "No theme set in _autitus.yml, setting to",
-      crayon::underline("default.\n")
+      crayon::underline("paper.\n")
     )
-    theme <- "default"
+    theme <- "paper"
   } else {
     theme <- settings[["style"]][["theme"]]
   }
@@ -51,11 +51,12 @@ launch_auritus <- function(){
 
   options(
     echarts4r_theme = echarts4r_theme,
-    database_settings = settings$database %||% "local",
     font = font
   )
 
   font_name <- gsub("[[:space:]]", "+", font)
+
+  inverse <- settings$style$inverse %||% FALSE
 
   # head
   head <- tagList(
@@ -97,31 +98,36 @@ launch_auritus <- function(){
     head <- tagAppendChild(head, ga_tag)
   }
 
-  ui <- bulmaPage(
-    bulmaNavbar(
-      color = "light",
-      bulmaNavbarBrand(
-        bulmaNavbarItem(
-          href = "#Home",
-          img(
-            src = "https://auritus.io/logo.png",
-            height="28"
-          )
-        ),
-        bulmaNavbarBurger()
-      ),
-      bulmaNavbarEnd(
-        bulmaNavbarItem(
-          "Overview"
-        )
+  pool <- NULL
+  if("database" %in% settings_list){
+    db <- settings$database
+    db$drv <- .type2drv(db$type)
+    db$type <- NULL # remove type before call
+    pool <- do.call(pool::dbPool, db)
+  }
+
+  onStop(function() {
+    pool::poolClose(pool)
+  })
+
+  ui <- navbarPage(
+    title = div(
+      img(
+        src = "https://auritus.io/logo.png",
+        height="28",
+        style = "margin-right: 25px;"
       )
     ),
-    tags$head(head),
-    bulmaNav(
+    fluid = TRUE,
+    inverse = inverse,
+    windowTitle = "auritus",
+    header = head,
+    theme = shinythemes::shinytheme(theme),
+    tabPanel(
       "Home",
       homeUI("home")
     ),
-    bulmaNav(
+    tabPanel(
       "Overview",
       overviewUI("overview")
     )
@@ -129,8 +135,8 @@ launch_auritus <- function(){
 
   server <- function(input, output, session){
 
-    callModule(home, "home")
-    callModule(overview, "overview")
+    callModule(home, "home", pool)
+    callModule(overview, "overview", pool)
   }
 
   shinyApp(ui, server)

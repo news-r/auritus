@@ -5,58 +5,56 @@ overviewUI <- function(id){
   ns <- NS(id)
 
   tagList(
-    bulmaSection(
-      bulmaLevel(
-        displayUI(ns("narticles"))
-      )
-    ),
-    bulmaSection(
-      bulmaColumns(
-        bulmaColumn(
-          bulmaCard(
-            bulmaCardHeader(
-              bulmaCardHeaderTitle(
-                "Trend", id = "trend-headline",
-                tippy_this("trend-headline", "Number of articles per day.")
-              )
+    div(
+      class = "",
+      fluidRow(
+        column(4, displayUI(ns("narticles")))
+      ),
+      hr(),
+      fluidRow(
+        column(
+          6,
+          div(
+            class = "thumbnail",
+            div(
+              class = "caption",
+              h3("TREND", id = "trend-headline"),
+              tippy_this("trend-headline", "Number of articles per day.")
             ),
-            bulmaCardContent(
-              echarts4rOutput(ns("trend"))
-            )
+            echarts4rOutput(ns("trend"))
           )
         ),
-        bulmaColumn(
-          bulmaCard(
-            bulmaCardHeader(
-              bulmaCardHeaderTitle(
-                "Geographic Spread", id = "map-headline",
-                tippy_this("map-headline", "Number of articles per country.")
-              )
+        column(
+          6,
+          div(
+            class = "thumbnail",
+            div(
+              class = "caption",
+              h3("GEOGRAPHIC SPREAD", id = "map-headline"),
+              tippy_this("map-headline", "Number of articles per country.")
             ),
-            bulmaCardContent(
-              echarts4rOutput(ns("map"))
-            )
+            echarts4rOutput(ns("map"))
           )
         )
       )
     )
   )
+
 }
 
-overview <- function(input, output, session){
+overview <- function(input, output, session, pool){
+
+  output$dateRange <- renderUI({
+  })
 
   n_articles <- reactive({
 
-    if(length(DB) == 1){
+    if(is.null(pool)){
 
       N <- nrow(get_articles())
 
     } else {
-
-      args <- .db_con(DB)
-      con <- do.call(dbConnect, args)
-      on.exit(dbDisconnect(con), add = TRUE)
-      N <- dbGetQuery(con, "SELECT COUNT(uuid) AS n FROM articles;") %>%
+      N <- dbGetQuery(pool, "SELECT COUNT(uuid) AS n FROM articles;") %>%
         pull(n)
 
     }
@@ -65,7 +63,7 @@ overview <- function(input, output, session){
 
   })
 
-  callModule(display, "narticles", "ARTICLES", n_articles(), "Number of articles crawled")
+  callModule(display, "narticles", "ARTICLES", n_articles(), "Number of articles")
 
   # common
   DB <- .get_db()
@@ -74,19 +72,15 @@ overview <- function(input, output, session){
 
   country <- reactive({
 
-    if(length(DB) == 1){
+    if(is.null(pool)){
       country <- get_articles()
 
       country <- country %>%
         count(thread_country, sort = T) %>%
         filter(thread_country != "")
     } else {
-
-      args <- .db_con(DB)
-      con <- do.call(dbConnect, args)
-      on.exit(dbDisconnect(con), add = TRUE)
-      country <- dbGetQuery(con, "SELECT thread_country, COUNT(thread_country) AS n FROM articles WHERE thread_country <> '' GROUP BY thread_country ORDER BY count(thread_country) DESC;")
-
+      query <- "SELECT thread_country, COUNT(thread_country) AS n FROM articles WHERE thread_country <> '' GROUP BY thread_country ORDER BY count(thread_country) DESC;"
+      country <- dbGetQuery(pool, query)
     }
 
     country %>%
@@ -96,16 +90,13 @@ overview <- function(input, output, session){
 
   trend_data <- reactive({
 
-    if(length(DB) == 1){
+    if(is.null(pool)){
 
       res <- get_articles() %>%
         mutate(published = as.Date(published))
 
     } else {
-      args <- .db_con(DB)
-      con <- do.call(dbConnect, args)
-      on.exit(dbDisconnect(con), add = TRUE)
-      dates <- dbGetQuery(con, "SELECT published FROM 'articles';")
+      dates <- dbGetQuery(pool, "SELECT published FROM 'articles';")
 
       res <- dates %>%
         mutate(

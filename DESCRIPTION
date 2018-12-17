@@ -9,6 +9,7 @@ LazyData: true
 Imports:
   DBI,
   cli,
+  pool,
   yaml,
   plyr,
   utils,
@@ -17,9 +18,10 @@ Imports:
   purrr,
   tippy,
   crayon,
+  countup,
   magrittr,
   webhoser,
-  shinybulma,
+  shinythemes,
   webhoser.extension
 Suggests:
   RSQLite,
@@ -27,6 +29,7 @@ Suggests:
   RPostgres,
 RoxygenNote: 6.1.1
 Remotes:
+  RStudio/pool,
+  JohnCoene/countup,
   JohnCoene/webhoser,
-  RinteRface/shinybulma,
   JohnCoene/webhoser.extension

@@ -2,8 +2,10 @@ displayUI <- function(id){
 
   ns <- NS(id)
 
-  tagList(
-    uiOutput(ns("lvl")),
+  div(
+    id = ns("tooltip"),
+    uiOutput(ns("heading")),
+    h3(countup::countupOutput(ns("value")), style = "text-align:center;"),
     tippyOutput(ns("tip"))
   )
 
@@ -11,16 +13,17 @@ displayUI <- function(id){
 
 display <- function(input, output, session, heading, value, tooltip){
 
-  output$lvl <- renderUI({
-    bulmaLevelItem(
-      heading,
-      value
-    )
+  output$heading <- renderUI({
+    h5(heading, style = "text-align:center;")
+  })
+
+  output$value <- countup::renderCountup({
+    countup::countup(value, duration = 3)
   })
 
   output$tip <- renderTippy({
     ns <- session$ns
-    tippy_this(ns("lvl"), tooltip)
+    tippy_this(ns("tooltip"), tooltip)
   })
 
 }

@@ -17,7 +17,7 @@ get_articles <- function(){
   if(isTRUE(ex))
     out <- get(load("data/articles.RData"))
   else {
-    cat(crayon::red(cli::symbol$cross), "No data crawled, see", crayon::underline("setup_auritus"))
+    cat(crayon::red(cli::symbol$cross), "No data, see", crayon::underline("setup_auritus"), "\n")
   }
 
   return(out)

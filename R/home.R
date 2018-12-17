@@ -5,44 +5,41 @@ homeUI <- function(id){
   ns <- NS(id)
 
   tagList(
-    bulmaHero(
-      fullheight = TRUE,
-      color = "light",
-      bulmaHeroBody(
-        bulmaContainer(
-          bulmaFigure(
-            src = "https://auritus.io/logo.png",
-            alt = "auritus"
+    br(),
+    br(),
+    div(
+      class = "container",
+      img(
+        width = "70%",
+        src = "https://auritus.io/logo.png",
+        alt = "auritus"
+      ),
+      br(),
+      br(),
+      h2("Free, Open-Source News Monitoring Platform."),
+      br(),
+      br(),
+      fluidRow(
+        column(
+          4,
+          tags$a(
+            class = "btn btn-default",
+            href = "https://github.com/JohnCoene/auritus",
+            target = "_blank",
+            icon("github"),
+            "Github"
           ),
-          br(),
-          br(),
-          bulmaTitle("Free, Open-Source News Monitoring Platform."),
-          br(),
-          bulmaColumns(
-            bulmaColumn(
-              width = 4,
-              bulmaButton(
-                bulmaIcon(
-                  "fa fa-github"
-                ),
-                href = "https://github.com/JohnCoene/auritus",
-                target = "_blank",
-                span("Github")
-              ),
-              bulmaButton(
-                bulmaIcon(
-                  "fa fa-desktop"
-                ),
-                href = "https://auritus.io/",
-                target = "_blank",
-                span("Website")
-              )
-            ),
-            bulmaColumn(
-              width = 8,
-              uiOutput(ns("recent"))
-            )
+          tags$a(
+            class = "btn btn-danger",
+            href = "https://auritus.io/",
+            target = "_blank",
+            icon("desktop"),
+            "Website"
           )
+        ),
+        column(
+          8,
+          uiOutput(ns("recent"))
         )
       )
     )
@@ -50,22 +47,19 @@ homeUI <- function(id){
 
 }
 
-home <- function(input, output, session){
+home <- function(input, output, session, pool){
 
   DB <- .get_db()
 
   latest <- reactive({
 
-    if(length(DB) == 1){
+    if(is.null(pool)){
 
       dat <- get_articles()
 
       mx <- max(dat$published)
     } else {
-      args <- .db_con(DB)
-      con <- do.call(dbConnect, args)
-      on.exit(dbDisconnect(con), add = TRUE)
-      mx <- dbGetQuery(con, "SELECT MAX(published) FROM 'articles';")
+      mx <- dbGetQuery(pool, "SELECT MAX(published) FROM 'articles';")
 
       if(inherits(mx[[1]], "numeric"))
         mx <- as.POSIXct(mx[[1]], origin = "1970-01-01 12:00")
@@ -77,9 +71,9 @@ home <- function(input, output, session){
 
   output$recent <- renderUI({
 
-    p(
-      class = "is-pulled-right",
-      "Most recent article in the bank was published",
+    h4(
+      class = "pull-right",
+      "Most recent article in the bank was published on",
       format(latest(), "%d %B %Y")
     )
   })
