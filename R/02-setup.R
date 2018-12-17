@@ -15,7 +15,7 @@
 #' @import shinybulma
 #'
 #' @export
-setup_auritus <- function(days = 30L, quiet = FALSE, pages = 3L){
+setup_auritus <- function(days = 30L, quiet = FALSE, pages = 50L){
 
   config <- "_auritus.yml"
 

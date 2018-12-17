@@ -15,7 +15,7 @@
 #'
 #' @name crawl
 #' @export
-crawl_data <- function(days = 30L, quiet = FALSE, pages = 3L, append = FALSE,
+crawl_data <- function(days = 30L, quiet = FALSE, pages = 50L, append = FALSE,
                        apply_segments = TRUE, since_last = TRUE, pause = 5, overwrite = FALSE, ...){
 
   config <- "_auritus.yml"
@@ -236,6 +236,16 @@ crawl_data <- function(days = 30L, quiet = FALSE, pages = 3L, append = FALSE,
     save(articles, file = fl)
     save(text, file = paste0(dir, "/text.RData"))
   } else {
+
+    # dates as strings if SQLite
+    if(settings$database$type == "SQLite"){
+      articles <- articles %>%
+        mutate(
+          published = as.character(published),
+          thread_published = as.character(thread_published),
+          crawled = as.character(crawled)
+        )
+    }
 
     con <- do.call(DBI::dbConnect, db)
     dbWriteTable(con, "articles", articles, append = append, overwrite = overwrite)

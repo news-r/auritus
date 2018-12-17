@@ -53,11 +53,14 @@
       nm_title <- paste0(nm, "_title_segment")
       nm_text <- paste0(nm, "_text_segment")
       nm_1p <- paste0(nm, "_1p_segment")
+      nm_total <- paste0(nm, "_total_segment")
 
       data <- data %>%
         webhoser.extension::whe_search_1p(relevant_segments$regex[[i]], nm_1p) %>%
         webhoser.extension::whe_search(relevant_segments$regex[[i]], nm_title, "thread.title") %>%
         webhoser.extension::whe_search(relevant_segments$regex[[i]], nm_text, "text")
+
+      data[[nm_total]] <- data[[nm_text]] + data[[nm_text]]
     }
 
   }

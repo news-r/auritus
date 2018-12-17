@@ -9,6 +9,8 @@ homeUI <- function(id){
     br(),
     div(
       class = "container",
+      br(),
+      br(),
       img(
         width = "70%",
         src = "https://auritus.io/logo.png",
@@ -59,10 +61,10 @@ home <- function(input, output, session, pool){
 
       mx <- max(dat$published)
     } else {
-      mx <- dbGetQuery(pool, "SELECT MAX(published) FROM 'articles';")
-
-      if(inherits(mx[[1]], "numeric"))
-        mx <- as.POSIXct(mx[[1]], origin = "1970-01-01 12:00")
+      mx <- dbGetQuery(pool, "SELECT MAX(published) FROM 'articles';") %>%
+        unlist() %>%
+        unname() %>%
+        as.Date()
     }
 
     return(mx)
@@ -73,7 +75,7 @@ home <- function(input, output, session, pool){
 
     h4(
       class = "pull-right",
-      "Most recent article in the bank was published on",
+      "Latest article was published on",
       format(latest(), "%d %B %Y")
     )
   })

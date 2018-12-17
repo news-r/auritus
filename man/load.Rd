@@ -4,11 +4,14 @@
 \alias{load}
 \alias{get_articles}
 \alias{get_text}
+\alias{get_data}
 \title{Load data}
 \usage{
 get_articles()
 
 get_text()
+
+get_data()
 }
 \description{
 Load data collected with \code{\link{crawl_data}} or \code{\link{setup_auritus}}.

@@ -6,33 +6,33 @@ overviewUI <- function(id){
 
   tagList(
     div(
-      class = "",
+      class = "container",
       fluidRow(
-        column(4, displayUI(ns("narticles")))
+        column(
+          4, uiOutput(ns("daterange"))
+        )
       ),
       hr(),
+      fluidRow(
+        column(4, displayUI(ns("narticles"))),
+        column(4, displayUI(ns("noutlets")))
+      ),
       fluidRow(
         column(
           6,
           div(
-            class = "thumbnail",
-            div(
-              class = "caption",
-              h3("TREND", id = "trend-headline"),
-              tippy_this("trend-headline", "Number of articles per day.")
-            ),
+            class = "well",
+            h3("TREND", id = "trend-headline"),
+            tippy_this("trend-headline", "Number of articles per day."),
             echarts4rOutput(ns("trend"))
           )
         ),
         column(
           6,
           div(
-            class = "thumbnail",
-            div(
-              class = "caption",
-              h3("GEOGRAPHIC SPREAD", id = "map-headline"),
-              tippy_this("map-headline", "Number of articles per country.")
-            ),
+            class = "well",
+            h3("GEOGRAPHIC REACH", id = "map-headline"),
+            tippy_this("map-headline", "Number of articles per country."),
             echarts4rOutput(ns("map"))
           )
         )
@@ -44,17 +44,52 @@ overviewUI <- function(id){
 
 overview <- function(input, output, session, pool){
 
-  output$dateRange <- renderUI({
+  output$daterange <- renderUI({
+
+    ns <- session$ns
+
+    if(is.null(pool)){
+      range <- range(get_articles()$published)
+    } else {
+      query <- "SELECT MIN(published) AS min, MAX(published) AS max FROM articles;"
+      range <- dbGetQuery(pool, query) %>%
+        unname() %>%
+        unlist()
+
+    }
+
+    range <- as.Date(range)
+
+    dateRangeInput(ns("daterangeOut"), "DATE RANGE", min = range[1], max = range[2], start = range[1], end = range[2])
   })
 
   n_articles <- reactive({
 
+    ns <- session$ns
+    req(input$daterangeOut)
+
+    dates <- input$daterangeOut
+    print(dates)
+
     if(is.null(pool)){
 
-      N <- nrow(get_articles())
+      N <- get_articles() %>%
+        filter(
+          published >= dates[1] && published <= dates[2]
+        ) %>%
+        nrow()
 
     } else {
-      N <- dbGetQuery(pool, "SELECT COUNT(uuid) AS n FROM articles;") %>%
+
+      query <- "SELECT COUNT(uuid) AS n FROM articles"
+
+      date_query <- paste0(
+        "WHERE published >= '", dates[1], " 00:00:00' AND published <= '", dates[2], " 23:59:59';"
+      )
+
+      query <- paste(query, date_query)
+
+      N <- dbGetQuery(pool, query) %>%
         pull(n)
 
     }
@@ -63,7 +98,23 @@ overview <- function(input, output, session, pool){
 
   })
 
+  n_outlets <- reactive({
+
+    if(is.null(pool)){
+
+      N <- length(unique(get_articles()$thread_site))
+
+    } else {
+      query <- "SELECT thread_site, COUNT(DISTINCT thread_site) AS n FROM articles;"
+      N <- dbGetQuery(pool, query) %>%
+        pull(n)
+    }
+
+    return(N)
+  })
+
   callModule(display, "narticles", "ARTICLES", n_articles(), "Number of articles")
+  callModule(display, "noutlets", "OUTLETS", n_outlets(), "Number of distinct media outlets")
 
   # common
   DB <- .get_db()

@@ -39,6 +39,18 @@ get_text <- function(){
   return(out)
 }
 
+#' @rdname load
+#' @export
+get_data <- function(){
+
+  get_articles() %>%
+    left_join(
+      get_text(),
+      by = "uuid"
+    )
+
+}
+
 #' @title Segment
 #'
 #' @description Re-segments all the data using segments in \code{_auritus.yml}.

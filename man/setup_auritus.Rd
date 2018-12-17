@@ -4,7 +4,7 @@
 \alias{setup_auritus}
 \title{Setup Auritus}
 \usage{
-setup_auritus(days = 30L, quiet = FALSE, pages = 3L)
+setup_auritus(days = 30L, quiet = FALSE, pages = 50L)
 }
 \arguments{
 \item{days}{Number of days from today (\code{Sys.Date()}) to craw articles.}
