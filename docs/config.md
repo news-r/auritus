@@ -195,9 +195,9 @@ tracking:
 
 Follow the structure given in the example above.
 
-## Defaults
+## Examples
 
-Below is the default setup _where defaults can be used._
+Below is an example setup _where defaults can be used._
 
 ```yaml
 # theme
