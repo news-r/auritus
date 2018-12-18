@@ -10,7 +10,7 @@ Required parameters are:
 
 ## Token
 
-Your _required_ [webhoser.io](https://webhose.io/) token. Simply create a free account to get it. [webhoser.io](https://webhose.io/) provides 1,000 free queries per month, which, if maximised, can adds up to 100,000 results. This should be plenty enough for most cases but you can always [pay](https://webhose.io/plans-and-pricing) to get more queries.
+Your _required_ [webhose.io](https://webhose.io/) token. Simply create a free account to get it. [webhose.io](https://webhose.io/) provides 1,000 free queries per month, which, if maximised, can adds up to 100,000 results. This should be plenty enough for most cases but you can always [pay](https://webhose.io/plans-and-pricing) to get more queries.
 
 ## Queries
 
@@ -18,9 +18,9 @@ Your [webhose.io](https://webhose.io/) queries, _required_. Note that you can sp
 
 Each query must include:
 
-- A `id`: unique integer.
-- A `name`: Which will be displayed on the platform.
-- A `query`: Boolean [webhose.io](https://webhose.io/) query.
+- `id`: unique integer.
+- `name`: Which will be displayed on the platform.
+- `query`: Boolean [webhose.io](https://webhose.io/) query., at least one.
 
 It is essential you read through the webhose's guide on [boolean queries](https://docs.webhose.io/v1.0/docs/basic-boolean-operators-tutorial) before settings this up. It will avoid you wasting precious queries.
 
@@ -32,7 +32,6 @@ queries:
     - id: 1
     - name: "ML"
     - search: '("machine learning" OR AI) AND programming is_first:true language:english'
-
 ```
 
 ## Database
