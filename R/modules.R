@@ -5,7 +5,7 @@ displayUI <- function(id){
   div(
     id = ns("tooltip"),
     uiOutput(ns("heading")),
-    h3(countup::countupOutput(ns("value")), style = "text-align:center;"),
+    uiOutput(ns("value")),
     tippyOutput(ns("tip"))
   )
 
@@ -17,8 +17,8 @@ display <- function(input, output, session, heading, react, tooltip){
     h5(heading, style = "text-align:center;")
   })
 
-  output$value <- countup::renderCountup({
-    countup::countup(react, duration = 3)
+  output$value <- renderUI({
+    h3(react(), style = "text-align:center;")
   })
 
   output$tip <- renderTippy({

@@ -61,16 +61,15 @@ overview <- function(input, output, session, pool){
   n_articles <- reactive({
 
     req(input$daterangeOut)
-
     dates <- input$daterangeOut
 
-    query <- "SELECT COUNT(uuid) AS n FROM articles"
+    base_query <- "SELECT COUNT(uuid) AS n FROM articles"
 
     date_query <- paste0(
       "WHERE published >= '", dates[1], " 00:00:00' AND published <= '", dates[2], " 23:59:59';"
     )
 
-    query <- paste(query, date_query)
+    query <- paste(base_query, date_query)
 
     N <- dbGetQuery(pool, query) %>%
       pull(n)
@@ -81,15 +80,26 @@ overview <- function(input, output, session, pool){
 
   n_outlets <- reactive({
 
-    query <- "SELECT thread_site, COUNT(DISTINCT thread_site) AS n FROM articles;"
+    req(input$daterangeOut)
+    dates <- input$daterangeOut
+
+    base_query <- "SELECT thread_site, COUNT(DISTINCT thread_site) AS n FROM articles"
+    date_query <- paste0(
+      "WHERE published >= '", dates[1], " 00:00:00' AND published <= '", dates[2], " 23:59:59';"
+    )
+
+    query <- paste(
+      base_query, date_query
+    )
+
     N <- dbGetQuery(pool, query) %>%
       pull(n)
 
     return(N)
   })
 
-  callModule(display, "narticles", "ARTICLES", n_articles(), "Number of articles")
-  callModule(display, "noutlets", "OUTLETS", n_outlets(), "Number of distinct media outlets")
+  callModule(display, "narticles", heading = "ARTICLES", react = n_articles, tooltip = "Number of articles")
+  callModule(display, "noutlets", heading = "OUTLETS", react = n_outlets, tooltip = "Number of distinct media outlets")
 
   # common
   DB <- .get_db()

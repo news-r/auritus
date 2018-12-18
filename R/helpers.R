@@ -1,56 +1,5 @@
 globalVariables("query_id")
 
-#' @title Load data
-#'
-#' @description Load data collected with \code{\link{crawl_data}} or \code{\link{setup_auritus}}.
-#'
-#' @examples
-#' \dontrun{data <- get_articles()}
-#'
-#' @name load
-#' @export
-get_articles <- function(){
-
-  ex <- file.exists("data/articles.RData")
-
-  out <- NULL
-  if(isTRUE(ex))
-    out <- get(load("data/articles.RData"))
-  else {
-    cat(crayon::red(cli::symbol$cross), "No data, see", crayon::underline("setup_auritus"), "\n")
-  }
-
-  return(out)
-}
-
-#' @rdname load
-#' @export
-get_text <- function(){
-
-  ex <- file.exists("data/text.RData")
-
-  out <- NULL
-  if(isTRUE(ex))
-    out <- get(load("data/text.RData"))
-  else {
-    cat(crayon::red(cli::symbol$cross), "No data crawled, see", crayon::underline("setup_auritus"))
-  }
-
-  return(out)
-}
-
-#' @rdname load
-#' @export
-get_data <- function(){
-
-  get_articles() %>%
-    left_join(
-      get_text(),
-      by = "uuid"
-    )
-
-}
-
 #' @title Segment
 #'
 #' @description Re-segments all the data using segments in \code{_auritus.yml}.

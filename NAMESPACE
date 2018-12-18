@@ -2,9 +2,6 @@
 
 export("%>%")
 export(crawl_data)
-export(get_articles)
-export(get_data)
-export(get_text)
 export(init_auritus)
 export(launch_auritus)
 export(segment_data)
