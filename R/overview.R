@@ -44,6 +44,10 @@ overviewUI <- function(id){
 
 overview <- function(input, output, session, pool){
 
+  # common
+  THEME <- .get_theme()
+  hide <- list(show = FALSE)
+
   output$daterange <- renderUI({
 
     ns <- session$ns
@@ -101,14 +105,19 @@ overview <- function(input, output, session, pool){
   callModule(display, "narticles", heading = "ARTICLES", react = n_articles, tooltip = "Number of articles")
   callModule(display, "noutlets", heading = "OUTLETS", react = n_outlets, tooltip = "Number of distinct media outlets")
 
-  # common
-  DB <- .get_db()
-  THEME <- .get_theme()
-  hide <- list(show = FALSE)
-
   country <- reactive({
 
-    query <- "SELECT thread_country, COUNT(thread_country) AS n FROM articles WHERE thread_country <> '' GROUP BY thread_country ORDER BY count(thread_country) DESC;"
+    req(input$daterangeOut)
+    dates <- input$daterangeOut
+
+    date_query <- paste0(
+      "CASE WHEN published >= '", dates[1], " 00:00:00' AND published <= '", dates[2], " 23:59:59' THEN 1 END"
+    )
+
+    query <- paste(
+      "SELECT thread_country, COUNT(", date_query, ") AS n FROM articles WHERE thread_country <> '' GROUP BY thread_country ORDER BY count(thread_country) DESC;"
+    )
+
     country <- dbGetQuery(pool, query) %>%
       e_country_names(thread_country, thread_country)
 
@@ -116,9 +125,20 @@ overview <- function(input, output, session, pool){
 
   trend_data <- reactive({
 
-    dates <- dbGetQuery(pool, "SELECT published FROM 'articles';")
+    req(input$daterangeOut)
+    dates <- input$daterangeOut
 
-    res <- dates %>%
+    date_query <- paste0(
+      "WHERE published >= '", dates[1], " 00:00:00' AND published <= '", dates[2], " 23:59:59'"
+    )
+
+    query <- paste0(
+      "SELECT published FROM 'articles' ", date_query, ";"
+    )
+
+    published <- dbGetQuery(pool, query)
+
+    published %>%
       mutate(
         published = as.POSIXct(published, origin = "1970-01-01"),
         published = as.Date(published)
@@ -130,7 +150,7 @@ overview <- function(input, output, session, pool){
   output$trend <- renderEcharts4r({
 
     trend_data() %>%
-      e_charts(published) %>%
+      e_charts(published, dispose = TRUE) %>%
       e_area(
         n,
         name = "articles",
@@ -150,7 +170,7 @@ overview <- function(input, output, session, pool){
   output$map <- renderEcharts4r({
 
     country() %>%
-      e_charts(thread_country) %>%
+      e_charts(thread_country, dispose = TRUE) %>%
       e_map_3d(n, name = "Articles by countries") %>%
       e_visual_map(n, orient = "horizontal", bottom = "5%", right = "5%") %>%
       e_theme(THEME) %>%
