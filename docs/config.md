@@ -4,13 +4,13 @@ All the configuration lives in one place: `_auritus.yml`.
 
 Required parameters are:
 
-- `database`
-- `token`
-- `queries`
+- `database`: to define the database used to store the data.
+- `token`: your [webhose.io](https://webhose.io/) token to collect the data.
+- `queries`: your boolean searches to query the data.
 
 ## Token
 
-Your _required_ [webhose.io](https://webhose.io/) token. Simply create a free account to get it. [webhose.io](https://webhose.io/) provides 1,000 free queries per month, which, if maximised, can adds up to 100,000 results. This should be plenty enough for most cases but you can always [pay](https://webhose.io/plans-and-pricing) to get more queries.
+Your _required_ [webhose.io](https://webhose.io/) token. Simply create a free account to get it. [webhose.io](https://webhose.io/) provides 1,000 free queries per month, which, if maximised, can add up to as many as 100,000 results (blog posts and news articles). 
 
 ## Queries
 
@@ -18,11 +18,11 @@ Your [webhose.io](https://webhose.io/) queries, _required_. Note that you can sp
 
 Each query must include:
 
-- `id`: unique integer.
+- `id`: A unique integer.
 - `name`: Which will be displayed on the platform.
 - `query`: Boolean [webhose.io](https://webhose.io/) query., at least one.
 
-It is essential you read through the webhose's guide on [boolean queries](https://docs.webhose.io/v1.0/docs/basic-boolean-operators-tutorial) before settings this up. It will avoid you wasting precious queries.
+It is essential you read through the webhose's guide on [boolean queries](https://docs.webhose.io/v1.0/docs/basic-boolean-operators-tutorial) before settings this up. It will avoid you wasting precious queries or collecting data that is not relevnt to your use case.
 
 ### Example
 
@@ -45,7 +45,7 @@ Currently, auritus supports:
 - `Postgres`
 - `MariaDB`
 
-The default setup as provided by `init_auritus`, sets up an `SQLite` database which is the simplest possible to setup (it does not require you to do anything). 
+The default setup as provided by `init_auritus`, uses an `SQLite` database which is the simplest possible to setup. SQLite does not require you to setup anything so leave it as is if you do not know about databases. Otherwise you are advised to use another `type` such as `Postgres` which will be much more performant and not stored on disk. However, SQLite might be good enough, depending on the amount of data you expect. 
 
 When using a database you must specify, at least:
 
@@ -93,7 +93,7 @@ style:
 
 ### Inverse
 
-Whether to use an inverse navbar (Bootstrap 3), defaults to `FALSE`.
+Whether to use an inverse navbar (Bootstrap 3), defaults to `false`.
 
 ### Theme
 
@@ -138,18 +138,6 @@ An [echarts4r theme name](https://echarts4r.john-coene.com/articles/themes.html)
 - `shine`
 - `purple-passion`
 - `halloween`
-
-### Example
-
-```yaml
-queries:
-  - wine:
-    - id: 1
-    - name: "Yellow Tail"
-    - search: '("Yellow Tail" OR "Mateus$") AND "wine$" is_first:true language:english'
-```
-
-Follow the structure given in the example above.
 
 ## Segments
 
