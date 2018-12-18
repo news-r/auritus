@@ -4,6 +4,10 @@
 
 auritus is an open-source, freely available platform to collect, analyse and visualse news coverage. 
 
+## What it does
+
+auritus lets you collect, store and visualise online news and blog content, _for free._ 
+
 ## Features
 
 - Free & open-source
