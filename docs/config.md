@@ -2,9 +2,42 @@
 
 All the configuration lives in one place: `_auritus.yml`.
 
+Required parameters are:
+
+- `database`
+- `token`
+- `queries`
+
+## Token
+
+Your _required_ [webhoser.io](https://webhose.io/) token. Simply create a free account to get it. [webhoser.io](https://webhose.io/) provides 1,000 free queries per month, which, if maximised, can adds up to 100,000 results. This should be plenty enough for most cases but you can always [pay](https://webhose.io/plans-and-pricing) to get more queries.
+
+## Queries
+
+Your [webhose.io](https://webhose.io/) queries, _required_. Note that you can specify more than one query.
+
+Each query must include:
+
+- A `id`: unique integer.
+- A `name`: Which will be displayed on the platform.
+- A `query`: Boolean [webhose.io](https://webhose.io/) query.
+
+It is essential you read through the webhose's guide on [boolean queries](https://docs.webhose.io/v1.0/docs/basic-boolean-operators-tutorial) before settings this up. It will avoid you wasting precious queries.
+
+### Example
+
+```yaml
+queries:
+  - wine:
+    - id: 1
+    - name: "ML"
+    - search: '("machine learning" OR AI) AND programming is_first:true language:english'
+
+```
+
 ## Database
 
-This is a _required_ option which lets you to make use of a database to store the data. If omitted the function `setup_auritus` will fail and prompt you to specify one.
+This is _required_, it lets you to make use of a database to store the data. If omitted the function `setup_auritus` will fail and prompt you to specify one.
 
 Currently, auritus supports:
 
@@ -13,9 +46,7 @@ Currently, auritus supports:
 - `Postgres`
 - `MariaDB`
 
-> SQLite is _not_ recommended
-
-SQLite is saved on disk and as such does not differ much from not using a database; in fact saving the data in files will make the platform faster than saving it in an SQLite database.
+The default setup as provided by `init_auritus`, sets up an `SQLite` database which is the simplest possible to setup (it does not require you to do anything). 
 
 When using a database you must specify, at least:
 
@@ -26,7 +57,7 @@ Specify the `type`, by name, as listed above under supported types, see the exam
 
 ### Examples
 
-An SQLite database.
+An SQLite database (default).
 
 ```yaml
 database:
@@ -34,7 +65,7 @@ database:
   dbname: auritus
 ```
 
-A Postgres database
+A Postgres database.
 
 ```yaml
 database:
@@ -108,14 +139,6 @@ An [echarts4r theme name](https://echarts4r.john-coene.com/articles/themes.html)
 - `shine`
 - `purple-passion`
 - `halloween`
-
-## Token
-
-Your _required_ [webhoser.io](https://webhose.io/) token. Simply create a free account to get it. [webhoser.io](https://webhose.io/) provides 1,000 free queries per month, which, if maximised, can adds up to 100,000 results. This should be plenty enough for most cases but you can always [pay](https://webhose.io/plans-and-pricing) to get more queries.
-
-## Queries
-
-Your [webhoser.io](https://webhose.io/) queries, _required_. Note that you can specify more than one query. It is essential you read through the webhose's guide on [boolean queries](https://docs.webhose.io/v1.0/docs/basic-boolean-operators-tutorial) before settings this up. It will avoid you wasting precious queries.
 
 ### Example
 

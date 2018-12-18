@@ -2,12 +2,6 @@
 
 <br/>
 <br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
 
 # Free, Open-source Media Monitoring Platform.
 

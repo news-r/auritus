@@ -17,7 +17,7 @@ display <- function(input, output, session, heading, react, tooltip){
     h5(heading, style = "text-align:center;")
   })
 
-  output$value <- countup::renderUI({
+  output$value <- countup::renderCountup({
     countup::countup(react, duration = 3)
   })
 
