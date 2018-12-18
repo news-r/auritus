@@ -14,11 +14,11 @@ displayUI <- function(id){
 display <- function(input, output, session, heading, react, tooltip){
 
   output$heading <- renderUI({
-    h5(heading, style = "text-align:center;")
+    p(heading, class = "text-center text-danger", style = "margin-bottom:0;")
   })
 
   output$value <- renderUI({
-    h3(react(), style = "text-align:center;")
+    h3(react(), class = "text-center", style = "margin-top:0;")
   })
 
   output$tip <- renderTippy({

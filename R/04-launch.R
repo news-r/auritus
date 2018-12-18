@@ -126,12 +126,16 @@ launch_auritus <- function(){
     header = head,
     theme = shinythemes::shinytheme(theme),
     tabPanel(
-      "Home",
+      "HOME",
       homeUI("home")
     ),
     tabPanel(
-      "Overview",
+      "OVERVIEW",
       overviewUI("overview")
+    ),
+    tabPanel(
+      "SEGMENTS",
+      segmentUI("segment")
     )
   )
 
@@ -139,6 +143,7 @@ launch_auritus <- function(){
 
     callModule(home, "home", pool)
     callModule(overview, "overview", pool)
+    callModule(segment, "segment", pool)
   }
 
   shinyApp(ui, server)

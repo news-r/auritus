@@ -15,8 +15,10 @@ overviewUI <- function(id){
       hr(),
       fluidRow(
         column(4, displayUI(ns("narticles"))),
-        column(4, displayUI(ns("noutlets")))
+        column(4, displayUI(ns("noutlets"))),
+        column(4, displayUI(ns("nshares")))
       ),
+      br(),
       fluidRow(
         column(
           6,
@@ -31,9 +33,21 @@ overviewUI <- function(id){
           6,
           div(
             class = "well",
-            h3("GEOGRAPHIC REACH", id = "map-headline"),
+            h3("REACH", id = "map-headline"),
             tippy_this("map-headline", "Number of articles per country."),
             echarts4rOutput(ns("map"))
+          )
+        )
+      ),
+      br(),
+      fluidRow(
+        column(
+          6,
+          div(
+            class = "well",
+            h3("TYPES", id = "type-headline"),
+            tippy_this("type-headline", "Number of articles per site type."),
+            echarts4rOutput(ns("siteType"))
           )
         )
       )
@@ -102,8 +116,29 @@ overview <- function(input, output, session, pool){
     return(N)
   })
 
+  n_shares <- reactive({
+
+    req(input$daterangeOut)
+    dates <- input$daterangeOut
+
+    base_query <- "SELECT COUNT(thread_social_facebook_shares) AS n FROM articles"
+
+    date_query <- paste0(
+      "WHERE published >= '", dates[1], " 00:00:00' AND published <= '", dates[2], " 23:59:59';"
+    )
+
+    query <- paste(base_query, date_query)
+
+    N <- dbGetQuery(pool, query) %>%
+      pull(n)
+
+    return(N)
+
+  })
+
   callModule(display, "narticles", heading = "ARTICLES", react = n_articles, tooltip = "Number of articles")
-  callModule(display, "noutlets", heading = "OUTLETS", react = n_outlets, tooltip = "Number of distinct media outlets")
+  callModule(display, "noutlets", heading = "MEDIA OUTLETS", react = n_outlets, tooltip = "Number of media outlets reached")
+  callModule(display, "nshares", heading = "FACEBOOK SHARES", react = n_shares, tooltip = "Number of Facebook shares")
 
   country <- reactive({
 
@@ -111,11 +146,13 @@ overview <- function(input, output, session, pool){
     dates <- input$daterangeOut
 
     date_query <- paste0(
-      "CASE WHEN published >= '", dates[1], " 00:00:00' AND published <= '", dates[2], " 23:59:59' THEN 1 END"
+      "AND published >= '", dates[1], " 00:00:00' AND published <= '", dates[2], " 23:59:59'"
     )
 
     query <- paste(
-      "SELECT thread_country, COUNT(", date_query, ") AS n FROM articles WHERE thread_country <> '' GROUP BY thread_country ORDER BY count(thread_country) DESC;"
+      "SELECT thread_country, COUNT(thread_country) AS n FROM articles WHERE thread_country <> ''",
+      date_query,
+      "GROUP BY thread_country ORDER BY count(thread_country) DESC;"
     )
 
     country <- dbGetQuery(pool, query) %>%
@@ -147,6 +184,39 @@ overview <- function(input, output, session, pool){
 
   })
 
+  type_data <- reactive({
+
+    req(input$daterangeOut)
+    dates <- input$daterangeOut
+
+    date_query <- paste0(
+      "WHERE published >= '", dates[1], " 00:00:00' AND published <= '", dates[2], " 23:59:59'"
+    )
+
+    query <- paste0(
+      "SELECT thread_site_type AS type, COUNT(thread_site_type) AS n FROM 'articles' ", date_query,
+      "GROUP BY thread_site_type ORDER BY count(thread_site_type) DESC;"
+    )
+
+    dbGetQuery(pool, query)
+
+  })
+
+  output$siteType <- renderEcharts4r({
+
+    type_data() %>%
+      e_charts(type) %>%
+      e_pie(
+        n,
+        name = "Articles of type",
+        radius = c("50%", "90%")
+      )  %>%
+      e_legend(bottom = 5) %>%
+      e_theme(THEME) %>%
+      e_text_style(fontFamily = .font())
+
+  })
+
   output$trend <- renderEcharts4r({
 
     trend_data() %>%
@@ -174,7 +244,8 @@ overview <- function(input, output, session, pool){
       e_map_3d(n, name = "Articles by countries") %>%
       e_visual_map(n, orient = "horizontal", bottom = "5%", right = "5%") %>%
       e_theme(THEME) %>%
-      e_text_style(fontFamily = .font())
+      e_text_style(fontFamily = .font()) %>%
+      e_tooltip()
   })
 
 }

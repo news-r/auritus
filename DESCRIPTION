@@ -18,10 +18,10 @@ Imports:
   purrr,
   tippy,
   crayon,
-  countup,
   magrittr,
   webhoser,
   shinythemes,
+  shinyWidgets,
   webhoser.extension
 Suggests:
   RSQLite,
