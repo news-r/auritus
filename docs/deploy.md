@@ -31,6 +31,19 @@ Now install auritus.
 sudo su - -c "R -e \"remotes::install_github('JohnCoene/auritus')\""
 ```
 
+You will also need the R package relevant to your database `type` (in `_auritus.yml`).
+
+```bash
+# SQLite
+sudo su - -c "R -e \"install.packages('RSQLite', repos='https://cran.rstudio.com/')\""
+# Postgres
+sudo su - -c "R -e \"install.packages('RPostgres', repos='https://cran.rstudio.com/')\""
+# MySQL
+sudo su - -c "R -e \"install.packages('RMySQL', repos='https://cran.rstudio.com/')\""
+# MariaDB
+sudo su - -c "R -e \"install.packages('RMariaDB', repos='https://cran.rstudio.com/')\""
+```
+
 Now you can install the Shiny server.
 
 ```bash
