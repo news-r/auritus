@@ -20,9 +20,9 @@ Imports:
   crayon,
   magrittr,
   webhoser,
+  webhoserx,
   shinythemes,
-  shinyWidgets,
-  webhoser.extension
+  shinyWidgets
 Suggests:
   RSQLite,
   RMariaDB,
@@ -32,4 +32,4 @@ Remotes:
   RStudio/pool,
   JohnCoene/countup,
   JohnCoene/webhoser,
-  JohnCoene/webhoser.extension
+  JohnCoene/webhoserx

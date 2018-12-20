@@ -3,7 +3,7 @@
 <br/>
 <br/>
 
-# Free, Open-source Media Monitoring Platform.
+# Free, Open-source PR Monitoring Platform.
 
 [GitHub](https://github.com/JohnCoene/auritus)
 [Get Started](guide)

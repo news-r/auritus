@@ -10,14 +10,20 @@ overviewUI <- function(id){
       fluidRow(
         column(
           4, uiOutput(ns("daterange"))
+        ),
+        column(
+          4,
+          uiOutput(ns("sitetypes"))
         )
       ),
       hr(),
       fluidRow(
-        column(4, displayUI(ns("narticles"))),
-        column(4, displayUI(ns("noutlets"))),
-        column(4, displayUI(ns("nshares")))
+        column(3, displayUI(ns("narticles"))),
+        column(3, displayUI(ns("noutlets"))),
+        column(3, displayUI(ns("nshares"))),
+        column(3, displayUI(ns("topnews")))
       ),
+      echarts4rOutput(ns("siteType"), height = 50),
       br(),
       fluidRow(
         column(
@@ -39,18 +45,7 @@ overviewUI <- function(id){
           )
         )
       ),
-      br(),
-      fluidRow(
-        column(
-          6,
-          div(
-            class = "well",
-            h3("TYPES", id = "type-headline"),
-            tippy_this("type-headline", "Number of articles per site type."),
-            echarts4rOutput(ns("siteType"))
-          )
-        )
-      )
+      br()
     )
   )
 
@@ -75,19 +70,49 @@ overview <- function(input, output, session, pool){
 
     dateRangeInput(ns("daterangeOut"), "DATE RANGE", min = range[1], max = range[2], start = range[1], end = range[2])
   })
+  
+  output$sitetypes <- renderUI({
+    
+    query <- "SELECT DISTINCT thread_site_type AS type FROM articles"
+    
+    choices <- dbGetQuery(pool, query) %>% 
+      pull(type)
+    
+    shinyWidgets::checkboxGroupButtons(
+      inputId = "sitetypesOut", 
+      label = "Label", 
+      choices = choices, 
+      selected = choices,
+      justified = TRUE, 
+      width = "100%",
+      checkIcon = list(yes = icon("ok", lib = "glyphicon"))
+    )
+  })
 
   n_articles <- reactive({
 
-    req(input$daterangeOut)
+    req(input$daterangeOut, input$sitetypesOut)
     dates <- input$daterangeOut
+    
+    print(input$sitetypesOut)
 
     base_query <- "SELECT COUNT(uuid) AS n FROM articles"
 
     date_query <- paste0(
-      "WHERE published >= '", dates[1], " 00:00:00' AND published <= '", dates[2], " 23:59:59';"
+      "WHERE published >= '", dates[1], " 00:00:00' AND published <= '", dates[2], " 23:59:59'"
+    )
+    
+    type_query <- paste(
+      "AND thread_site_type IN(", 
+      paste0(
+        "'", 
+        paste(input$sitetypesOut, collapse = "','"),
+        "'"
+      )
+      , ")"
     )
 
-    query <- paste(base_query, date_query)
+    query <- paste(base_query, date_query, type_query, ";")
 
     N <- dbGetQuery(pool, query) %>%
       pull(n)
@@ -135,10 +160,31 @@ overview <- function(input, output, session, pool){
     return(N)
 
   })
+  
+  top_news <- reactive({
+    
+    req(input$daterangeOut)
+    dates <- input$daterangeOut
+    
+    base_query <- "SELECT thread_site, COUNT(thread_site) AS n FROM articles"
+    
+    date_query <- paste0(
+      "WHERE published >= '", dates[1], " 00:00:00' AND published <= '", dates[2], " 23:59:59';"
+    )
+    
+    query <- paste(base_query, date_query, "AND thread_site_type = 'news'")
+    
+    N <- dbGetQuery(pool, query) %>%
+      pull(thread_site)
+    
+    return(N)
+    
+  })
 
   callModule(display, "narticles", heading = "ARTICLES", react = n_articles, tooltip = "Number of articles")
   callModule(display, "noutlets", heading = "MEDIA OUTLETS", react = n_outlets, tooltip = "Number of media outlets reached")
   callModule(display, "nshares", heading = "FACEBOOK SHARES", react = n_shares, tooltip = "Number of Facebook shares")
+  callModule(display, "topnews", heading = "TOP OUTLET", react = top_news, tooltip = "TOP MEDIA OUTLET")
 
   country <- reactive({
 
@@ -205,22 +251,51 @@ overview <- function(input, output, session, pool){
   output$siteType <- renderEcharts4r({
 
     type_data() %>%
-      e_charts(type) %>%
-      e_pie(
+      mutate(
+        x = "articles",
+        n = n / sum(n),
+        n = round(n * 100, 1)
+      ) %>% 
+      group_by(type) %>% 
+      e_charts(x, height = 50) %>%
+      e_bar(
         n,
-        name = "Articles of type",
-        radius = c("50%", "90%")
-      )  %>%
-      e_legend(bottom = 5) %>%
+        radius = c("50%", "90%"),
+        stack = "stack"
+      ) %>%
+      e_labels(
+        position = "inside",
+        formatter = "{a}",
+        fontSize = 8,
+        fontWeight = "bold"
+      ) %>% 
+      e_grid(
+        top = 0,
+        bottom = 0,
+        left = 0,
+        right = 0
+      ) %>% 
+      e_x_axis(
+        show = FALSE
+      ) %>% 
+      e_y_axis(
+        show = FALSE,
+        max = 100
+      ) %>% 
+      e_legend(FALSE) %>% 
+      e_flip_coords() %>%
       e_theme(THEME) %>%
-      e_text_style(fontFamily = .font())
+      e_text_style(fontFamily = .font()) %>% 
+      e_tooltip(
+        formatter = htmlwidgets::JS("function(params){return(params.value[0] + '%')}")
+      )
 
   })
 
   output$trend <- renderEcharts4r({
 
     trend_data() %>%
-      e_charts(published, dispose = TRUE) %>%
+      e_charts(published, dispose = FALSE) %>%
       e_area(
         n,
         name = "articles",
@@ -240,7 +315,7 @@ overview <- function(input, output, session, pool){
   output$map <- renderEcharts4r({
 
     country() %>%
-      e_charts(thread_country, dispose = TRUE) %>%
+      e_charts(thread_country, dispose = FALSE) %>%
       e_map_3d(n, name = "Articles by countries") %>%
       e_visual_map(n, orient = "horizontal", bottom = "5%", right = "5%") %>%
       e_theme(THEME) %>%

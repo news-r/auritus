@@ -11,9 +11,9 @@
 #' Preprocess results of webhose.io
 #' @param dat Data as returned by webhoser.
 .preproc_crawl <- function(dat){
-  dat$published <- webhoser.extension::whe_date(dat$published)
-  dat$thread.published <- webhoser.extension::whe_date(dat$thread.published)
-  dat$crawled <- webhoser.extension::whe_date(dat$crawled)
+  dat$published <- webhoserx::whe_date(dat$published)
+  dat$thread.published <- webhoserx::whe_date(dat$thread.published)
+  dat$crawled <- webhoserx::whe_date(dat$crawled)
   return(dat)
 }
 
@@ -56,9 +56,9 @@
       nm_total <- paste0(nm, "_total_segment")
 
       data <- data %>%
-        webhoser.extension::whe_search_1p(relevant_segments$regex[[i]], nm_1p) %>%
-        webhoser.extension::whe_search(relevant_segments$regex[[i]], nm_title, "thread.title") %>%
-        webhoser.extension::whe_search(relevant_segments$regex[[i]], nm_text, "text")
+        webhoserx::whe_search_1p(relevant_segments$regex[[i]], nm_1p) %>%
+        webhoserx::whe_search(relevant_segments$regex[[i]], nm_title, "thread.title") %>%
+        webhoserx::whe_search(relevant_segments$regex[[i]], nm_text, "text")
 
       data[[nm_total]] <- data[[nm_text]] + data[[nm_text]]
     }
