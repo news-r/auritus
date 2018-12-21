@@ -14,7 +14,7 @@ init_auritus <- function(){
 
   } else {
     file.copy(
-      system.file("templates/_auritus.yml", package = "auritus"),
+      system.file("templates/auritus.yml", package = "auritus"),
       "_auritus.yml"
     )
 

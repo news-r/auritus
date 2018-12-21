@@ -77,18 +77,6 @@
   getOption("echarts4r_theme")
 }
 
-#' Get database setup
-.get_db <- function(){
-  getOption("database_settings")
-}
-
-#' Get Connection settings
-.db_con <- function(db){
-  db$drv <- .type2drv(db$type)
-  db$type <- NULL # remove type before call
-  return(db)
-}
-
 #' Get font
 .font <- function(){
   getOption("font")
@@ -110,4 +98,26 @@
     DRV <- RSQLite::SQLite()
 
   return(DRV)
+}
+
+#' Make site type query
+#' @param input shiny site type input
+.type2query <- function(input){
+  paste(
+    "AND thread_site_type IN(", 
+    paste0(
+      "'", 
+      paste(input, collapse = "','"),
+      "'"
+    )
+    , ")"
+  )
+}
+
+#' Date to query
+#' @param dates Date range
+.dates2query <- function(dates){
+  paste0(
+    "WHERE published >= '", dates[1], " 00:00:00' AND published <= '", dates[2], " 23:59:59'"
+  )
 }

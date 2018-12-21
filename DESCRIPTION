@@ -20,10 +20,13 @@ Imports:
   crayon,
   magrittr,
   webhoser,
+  echarts4r,
   webhoserx,
+  htmlwidgets,
   shinythemes,
   shinyWidgets
 Suggests:
+  RMySQL,
   RSQLite,
   RMariaDB,
   RPostgres,

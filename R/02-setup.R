@@ -6,13 +6,12 @@
 #'
 #' @note Read the documentation first.
 #'
-#' @importFrom utils browseURL
+#' @importFrom utils browseURL installed.packages
 #' @import DBI
 #' @import tippy
 #' @import shiny
 #' @import dplyr
 #' @import echarts4r
-#' @import shinybulma
 #'
 #' @export
 setup_auritus <- function(days = 30L, quiet = FALSE, pages = 50L){

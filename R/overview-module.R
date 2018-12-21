@@ -78,8 +78,10 @@ overview <- function(input, output, session, pool){
     choices <- dbGetQuery(pool, query) %>% 
       pull(type)
     
+    ns <- session$ns
+    
     shinyWidgets::checkboxGroupButtons(
-      inputId = "sitetypesOut", 
+      inputId = ns("sitetypesOut"), 
       label = "Label", 
       choices = choices, 
       selected = choices,
@@ -93,24 +95,12 @@ overview <- function(input, output, session, pool){
 
     req(input$daterangeOut, input$sitetypesOut)
     dates <- input$daterangeOut
-    
-    print(input$sitetypesOut)
 
     base_query <- "SELECT COUNT(uuid) AS n FROM articles"
 
-    date_query <- paste0(
-      "WHERE published >= '", dates[1], " 00:00:00' AND published <= '", dates[2], " 23:59:59'"
-    )
+    date_query <- .dates2query(input$daterangeOut)
     
-    type_query <- paste(
-      "AND thread_site_type IN(", 
-      paste0(
-        "'", 
-        paste(input$sitetypesOut, collapse = "','"),
-        "'"
-      )
-      , ")"
-    )
+    type_query <- .type2query(input$sitetypesOut)
 
     query <- paste(base_query, date_query, type_query, ";")
 
@@ -123,16 +113,17 @@ overview <- function(input, output, session, pool){
 
   n_outlets <- reactive({
 
-    req(input$daterangeOut)
+    req(input$daterangeOut, input$sitetypesOut)
     dates <- input$daterangeOut
 
     base_query <- "SELECT thread_site, COUNT(DISTINCT thread_site) AS n FROM articles"
-    date_query <- paste0(
-      "WHERE published >= '", dates[1], " 00:00:00' AND published <= '", dates[2], " 23:59:59';"
-    )
+    
+    date_query <- .dates2query(input$daterangeOut)
 
+    type_query <- .type2query(input$sitetypesOut)
+    
     query <- paste(
-      base_query, date_query
+      base_query, date_query, type_query, ";"
     )
 
     N <- dbGetQuery(pool, query) %>%
@@ -143,16 +134,16 @@ overview <- function(input, output, session, pool){
 
   n_shares <- reactive({
 
-    req(input$daterangeOut)
+    req(input$daterangeOut, input$sitetypesOut)
     dates <- input$daterangeOut
 
     base_query <- "SELECT COUNT(thread_social_facebook_shares) AS n FROM articles"
 
-    date_query <- paste0(
-      "WHERE published >= '", dates[1], " 00:00:00' AND published <= '", dates[2], " 23:59:59';"
-    )
+    date_query <- .dates2query(input$daterangeOut)
+    
+    type_query <- .type2query(input$sitetypesOut)
 
-    query <- paste(base_query, date_query)
+    query <- paste(base_query, date_query, type_query, ";")
 
     N <- dbGetQuery(pool, query) %>%
       pull(n)
@@ -163,16 +154,16 @@ overview <- function(input, output, session, pool){
   
   top_news <- reactive({
     
-    req(input$daterangeOut)
+    req(input$daterangeOut, input$sitetypesOut)
     dates <- input$daterangeOut
     
     base_query <- "SELECT thread_site, COUNT(thread_site) AS n FROM articles"
     
-    date_query <- paste0(
-      "WHERE published >= '", dates[1], " 00:00:00' AND published <= '", dates[2], " 23:59:59';"
-    )
+    date_query <- .dates2query(input$daterangeOut)
     
-    query <- paste(base_query, date_query, "AND thread_site_type = 'news'")
+    type_query <- .type2query(input$sitetypesOut)
+    
+    query <- paste(base_query, date_query, type_query, ";")
     
     N <- dbGetQuery(pool, query) %>%
       pull(thread_site)
@@ -188,17 +179,16 @@ overview <- function(input, output, session, pool){
 
   country <- reactive({
 
-    req(input$daterangeOut)
-    dates <- input$daterangeOut
+    req(input$daterangeOut, input$sitetypesOut)
 
-    date_query <- paste0(
-      "AND published >= '", dates[1], " 00:00:00' AND published <= '", dates[2], " 23:59:59'"
-    )
+    date_query <- .dates2query(input$daterangeOut)
+    
+    type_query <- .type2query(input$sitetypesOut)
 
     query <- paste(
-      "SELECT thread_country, COUNT(thread_country) AS n FROM articles WHERE thread_country <> ''",
-      date_query,
-      "GROUP BY thread_country ORDER BY count(thread_country) DESC;"
+      "SELECT thread_country, COUNT(thread_country) AS n FROM articles",
+      date_query, type_query,
+      "AND thread_country <> '' GROUP BY thread_country ORDER BY count(thread_country) DESC;"
     )
 
     country <- dbGetQuery(pool, query) %>%
@@ -208,15 +198,15 @@ overview <- function(input, output, session, pool){
 
   trend_data <- reactive({
 
-    req(input$daterangeOut)
+    req(input$daterangeOut, input$sitetypesOut)
     dates <- input$daterangeOut
 
-    date_query <- paste0(
-      "WHERE published >= '", dates[1], " 00:00:00' AND published <= '", dates[2], " 23:59:59'"
-    )
+    date_query <- .dates2query(input$daterangeOut)
+    
+    type_query <- .type2query(input$sitetypesOut)
 
     query <- paste0(
-      "SELECT published FROM 'articles' ", date_query, ";"
+      "SELECT published FROM 'articles' ", date_query, type_query, ";"
     )
 
     published <- dbGetQuery(pool, query)
@@ -232,15 +222,15 @@ overview <- function(input, output, session, pool){
 
   type_data <- reactive({
 
-    req(input$daterangeOut)
-    dates <- input$daterangeOut
+    req(input$daterangeOut, input$sitetypesOut)
 
-    date_query <- paste0(
-      "WHERE published >= '", dates[1], " 00:00:00' AND published <= '", dates[2], " 23:59:59'"
-    )
+    date_query <- .dates2query(input$daterangeOut)
+    
+    type_query <- .type2query(input$sitetypesOut)
 
     query <- paste0(
-      "SELECT thread_site_type AS type, COUNT(thread_site_type) AS n FROM 'articles' ", date_query,
+      "SELECT thread_site_type AS type, COUNT(thread_site_type) AS n FROM 'articles' ", 
+      date_query, type_query,
       "GROUP BY thread_site_type ORDER BY count(thread_site_type) DESC;"
     )
 
