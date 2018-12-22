@@ -23,6 +23,14 @@ overviewUI <- function(id){
         column(3, displayUI(ns("nshares"))),
         column(3, displayUI(ns("sentiment")))
       ),
+      br(),
+      fluidRow(
+        column(3, displayUI(ns("language"))),
+        column(3, displayUI(ns("topmedia"))),
+        column(3, displayUI(ns("nwords"))),
+        column(3, displayUI(ns("lexdiv")))
+      ),
+      br(),
       echarts4rOutput(ns("siteType"), height = 50),
       br(),
       fluidRow(
@@ -44,13 +52,6 @@ overviewUI <- function(id){
             echarts4rOutput(ns("map"))
           )
         )
-      ),
-      br(),
-      fluidRow(
-        column(3, displayUI(ns("language"))),
-        column(3, displayUI(ns("topmedia"))),
-        column(3, displayUI(ns("nwords"))),
-        column(3, displayUI(ns("lexdiv")))
       )
     )
   )
@@ -143,7 +144,7 @@ overview <- function(input, output, session, pool){
     req(input$daterangeOut, input$sitetypesOut)
     dates <- input$daterangeOut
 
-    base_query <- "SELECT COUNT(thread_social_facebook_shares) AS n FROM articles"
+    base_query <- "SELECT SUM(thread_social_facebook_shares) AS n FROM articles"
 
     date_query <- .dates2query(input$daterangeOut)
     
