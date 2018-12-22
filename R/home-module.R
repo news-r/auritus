@@ -9,6 +9,7 @@ homeUI <- function(id){
     br(),
     div(
       class = "container",
+      style = "min-height:90vh;",
       br(),
       br(),
       img(

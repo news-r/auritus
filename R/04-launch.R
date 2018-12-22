@@ -136,6 +136,25 @@ launch_auritus <- function(){
     tabPanel(
       "SEGMENTS",
       segmentUI("segment")
+    ),
+    footer = tagList(
+      hr(),
+      div(
+        class = "container",
+        fluidRow(
+          column(
+            3, 
+            "Developed with",
+            tags$a(
+              href = "https://auritus.io",
+              target = "_blank",
+              "auritus",
+              class = "text-danger"
+            )
+          )
+        )
+      ),
+      br()
     )
   )
 
