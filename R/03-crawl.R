@@ -136,6 +136,7 @@ crawl_data <- function(days = 30L, quiet = FALSE, pages = 50L, append = FALSE,
   cat(
     cli::rule(left = crayon::green("Crawling webhose.io"))
   )
+  cat("\n")
 
   # loop over queries
   for(i in 1:length(settings$queries)){
@@ -157,7 +158,15 @@ crawl_data <- function(days = 30L, quiet = FALSE, pages = 50L, append = FALSE,
       mutate(
         query_id = q$id,
         query_name = q$name
-      )
+      ) %>% 
+      webhoserx::whe_lexdiv() %>% 
+      webhoserx::whe_paragraphs() %>% 
+      webhoserx::whe_pre_gram(flatten = TRUE) %>% 
+      webhoserx::whe_quotes() %>% 
+      webhoserx::whe_sentences() %>% 
+      webhoserx::whe_topmedia() %>% 
+      webhoserx::whe_words() %>% 
+      webhoserx::whe_sentiment()
 
     # dedupe
     query <- query %>%

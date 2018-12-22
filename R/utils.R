@@ -58,7 +58,7 @@
       data <- data %>%
         webhoserx::whe_search_1p(relevant_segments$regex[[i]], nm_1p) %>%
         webhoserx::whe_search(relevant_segments$regex[[i]], nm_title, "thread.title") %>%
-        webhoserx::whe_search(relevant_segments$regex[[i]], nm_text, "text")
+        webhoserx::whe_search(relevant_segments$regex[[i]], nm_text, "text") 
 
       data[[nm_total]] <- data[[nm_text]] + data[[nm_text]]
     }

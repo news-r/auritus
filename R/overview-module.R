@@ -9,10 +9,10 @@ overviewUI <- function(id){
       class = "container",
       fluidRow(
         column(
-          4, uiOutput(ns("daterange"))
+          6, uiOutput(ns("daterange"))
         ),
         column(
-          4,
+          6,
           uiOutput(ns("sitetypes"))
         )
       ),
@@ -21,7 +21,7 @@ overviewUI <- function(id){
         column(3, displayUI(ns("narticles"))),
         column(3, displayUI(ns("noutlets"))),
         column(3, displayUI(ns("nshares"))),
-        column(3, displayUI(ns("topnews")))
+        column(3, displayUI(ns("sentiment")))
       ),
       echarts4rOutput(ns("siteType"), height = 50),
       br(),
@@ -45,7 +45,13 @@ overviewUI <- function(id){
           )
         )
       ),
-      br()
+      br(),
+      fluidRow(
+        column(3, displayUI(ns("language"))),
+        column(3, displayUI(ns("topmedia"))),
+        column(3, displayUI(ns("nwords"))),
+        column(3, displayUI(ns("lexdiv")))
+      )
     )
   )
 
@@ -152,7 +158,49 @@ overview <- function(input, output, session, pool){
 
   })
   
-  top_news <- reactive({
+  sentiment <- reactive({
+    
+    req(input$daterangeOut, input$sitetypesOut)
+    dates <- input$daterangeOut
+    
+    base_query <- "SELECT AVG(sentiment) AS sentiment FROM articles"
+    
+    date_query <- .dates2query(input$daterangeOut)
+    
+    type_query <- .type2query(input$sitetypesOut)
+    
+    query <- paste(base_query, date_query, type_query, ";")
+    
+    N <- dbGetQuery(pool, query) %>%
+      pull(sentiment) %>% 
+      round()
+    
+    return(N)
+    
+  })
+  
+  language <- reactive({
+    
+    req(input$daterangeOut, input$sitetypesOut)
+    dates <- input$daterangeOut
+    
+    base_query <- "SELECT language, COUNT(language) AS n FROM articles"
+    
+    date_query <- .dates2query(input$daterangeOut)
+    
+    type_query <- .type2query(input$sitetypesOut)
+    
+    query <- paste(
+      base_query, date_query, type_query, ";"
+    )
+    
+    N <- dbGetQuery(pool, query) %>%
+      pull(language)
+    
+    return(N)
+  })
+  
+  topmedia <- reactive({
     
     req(input$daterangeOut, input$sitetypesOut)
     dates <- input$daterangeOut
@@ -168,6 +216,50 @@ overview <- function(input, output, session, pool){
     N <- dbGetQuery(pool, query) %>%
       pull(thread_site)
     
+    N <- gsub("\\..*", "", N)
+    
+    return(N)
+    
+  })
+  
+  nwords <- reactive({
+    
+    req(input$daterangeOut, input$sitetypesOut)
+    dates <- input$daterangeOut
+    
+    base_query <- "SELECT AVG(nwords) AS nwords FROM articles"
+    
+    date_query <- .dates2query(input$daterangeOut)
+    
+    type_query <- .type2query(input$sitetypesOut)
+    
+    query <- paste(base_query, date_query, type_query, ";")
+    
+    N <- dbGetQuery(pool, query) %>%
+      pull(nwords) %>% 
+      round()
+    
+    return(N)
+    
+  })
+  
+  lexdiv <- reactive({
+    
+    req(input$daterangeOut, input$sitetypesOut)
+    dates <- input$daterangeOut
+    
+    base_query <- "SELECT AVG(lexdiv) AS lexdiv FROM articles"
+    
+    date_query <- .dates2query(input$daterangeOut)
+    
+    type_query <- .type2query(input$sitetypesOut)
+    
+    query <- paste(base_query, date_query, type_query, ";")
+    
+    N <- dbGetQuery(pool, query) %>%
+      pull(lexdiv) %>% 
+      round()
+    
     return(N)
     
   })
@@ -175,7 +267,11 @@ overview <- function(input, output, session, pool){
   callModule(display, "narticles", heading = "ARTICLES", react = n_articles, tooltip = "Number of articles")
   callModule(display, "noutlets", heading = "MEDIA OUTLETS", react = n_outlets, tooltip = "Number of media outlets reached")
   callModule(display, "nshares", heading = "FACEBOOK SHARES", react = n_shares, tooltip = "Number of Facebook shares")
-  callModule(display, "topnews", heading = "TOP OUTLET", react = top_news, tooltip = "TOP MEDIA OUTLET")
+  callModule(display, "sentiment", heading = "SENTIMENT", react = sentiment, tooltip = "Average setniment")
+  callModule(display, "language", heading = "TOP LANGUAGE", react = language, tooltip = "Most popular language")
+  callModule(display, "topmedia", heading = "TOP OUTLET", react = topmedia, tooltip = "Most popular outlet")
+  callModule(display, "nwords", heading = "ARTICLE LENGTH", react = nwords, tooltip = "Average number of words per article")
+  callModule(display, "lexdiv", heading = "SOPHISTICATION", react = lexdiv, tooltip = "How sophsiticated the language of articles are (average lexical diversity)")
 
   country <- reactive({
 

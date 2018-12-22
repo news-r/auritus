@@ -145,6 +145,8 @@ This is where you define, _optional_, segments. This segments allow you the esse
 
 The `query` parameter refers to the id the `query` to apply the segment to.
 
+Note that segments are not mutually exclusive, one article may be in one than more category.
+
 ### Example
 
 ```yaml
