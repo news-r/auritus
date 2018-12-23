@@ -22,6 +22,7 @@ Imports:
   webhoser,
   echarts4r,
   webhoserx,
+  textillate,
   htmlwidgets,
   shinythemes,
   shinyWidgets
@@ -33,6 +34,6 @@ Suggests:
 RoxygenNote: 6.1.1
 Remotes:
   RStudio/pool,
-  JohnCoene/countup,
   JohnCoene/webhoser,
-  JohnCoene/webhoserx
+  JohnCoene/webhoserx,
+  JohnCoene/textillate

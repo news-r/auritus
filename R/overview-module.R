@@ -39,6 +39,7 @@ overviewUI <- function(id){
           div(
             class = "well",
             h3("TREND", id = "trend-headline"),
+            p("Number of articles per day."),
             tippy_this("trend-headline", "Number of articles per day."),
             echarts4rOutput(ns("trend"))
           )
@@ -48,10 +49,19 @@ overviewUI <- function(id){
           div(
             class = "well",
             h3("REACH", id = "map-headline"),
+            p("Number of articles published per country."),
             tippy_this("map-headline", "Number of articles per country."),
             echarts4rOutput(ns("map"))
           )
         )
+      ),
+      br(),
+      div(
+        class = "well",
+        h3("SENTIMENT", id = "sentiment-headline"),
+        p("Three day rolling sentiment average."),
+        tippy_this("sentiment-headline", "Distribution of sentiment."),
+        echarts4rOutput(ns("sentimentChart"), height = 230)
       )
     )
   )
@@ -63,6 +73,10 @@ overview <- function(input, output, session, pool){
   # common
   THEME <- .get_theme()
   hide <- list(show = FALSE)
+  avg <- list(
+    type = "average",
+    name = "AVG"
+  )
 
   output$daterange <- renderUI({
 
@@ -265,12 +279,12 @@ overview <- function(input, output, session, pool){
     
   })
 
-  callModule(display, "narticles", heading = "ARTICLES", react = n_articles, tooltip = "Number of articles")
+  callModule(display, "narticles", heading = "ARTICLES", react = n_articles, tooltip = "Total number of articles")
   callModule(display, "noutlets", heading = "MEDIA OUTLETS", react = n_outlets, tooltip = "Number of media outlets reached")
   callModule(display, "nshares", heading = "FACEBOOK SHARES", react = n_shares, tooltip = "Number of Facebook shares")
   callModule(display, "sentiment", heading = "SENTIMENT", react = sentiment, tooltip = "Average setniment")
-  callModule(display, "language", heading = "TOP LANGUAGE", react = language, tooltip = "Most popular language")
-  callModule(display, "topmedia", heading = "TOP OUTLET", react = topmedia, tooltip = "Most popular outlet")
+  callModule(display, "language", heading = "TOP LANGUAGE", react = language, tooltip = "Most popular language by number of articles")
+  callModule(display, "topmedia", heading = "TOP OUTLET", react = topmedia, tooltip = "Most popular outlet by number of articles")
   callModule(display, "nwords", heading = "ARTICLE LENGTH", react = nwords, tooltip = "Average number of words per article")
   callModule(display, "lexdiv", heading = "SOPHISTICATION", react = lexdiv, tooltip = "How sophsiticated the language of articles are (average lexical diversity)")
 
@@ -334,7 +348,73 @@ overview <- function(input, output, session, pool){
     dbGetQuery(pool, query)
 
   })
+  
+  sentiment_chart <- reactive({
+    
+    req(input$daterangeOut, input$sitetypesOut)
+    
+    date_query <- .dates2query(input$daterangeOut)
+    type_query <- .type2query(input$sitetypesOut)
+    
+    query <- paste0(
+      "SELECT published, sentiment FROM 'articles' ", 
+      date_query, type_query,
+      ";"
+    )
+    
+    dbGetQuery(pool, query) %>% 
+      mutate(
+        published = as.Date(published)
+      ) %>% 
+      group_by(published) %>% 
+      summarise(sentiment = sum(sentiment) / n()) %>% 
+      ungroup() %>% 
+      mutate(
+        sent_lag1 = lag(sentiment, 1),
+        sent_lag2 = lag(sentiment, 2),
+        sent_lag3 = lag(sentiment, 3),
+        sent_lag = (sent_lag1 + sent_lag2 + sent_lag3) / 3,
+        sent_lag = round(sent_lag)
+      ) %>% 
+      filter(!is.na(sent_lag))
+    
+  })
 
+  output$sentimentChart <- renderEcharts4r({
+    
+    sentiment_chart() %>% 
+      e_charts(published) %>% 
+      e_area(
+        sent_lag, 
+        name = "3 day sentiment average", 
+        legend = FALSE,
+        smooth = TRUE
+      ) %>% 
+      e_visual_map(sent_lag, show = FALSE) %>% 
+      e_tooltip(trigger = "axis") %>% 
+      e_y_axis(
+        axisLine = hide, 
+        axisTick = hide, 
+        axisLabel = hide
+      ) %>% 
+      e_grid(
+        left = 10, 
+        right = 10, 
+        bottom = 20, 
+        top = 5
+      ) %>% 
+      e_mark_line(
+        data = avg,
+        precision = 0,
+        label = list(
+          position = "middle"
+        )
+      ) %>% 
+      e_theme(THEME) %>%
+      e_text_style(fontFamily = .font()) 
+    
+  })
+  
   output$siteType <- renderEcharts4r({
 
     type_data() %>%
@@ -393,7 +473,15 @@ overview <- function(input, output, session, pool){
       e_tooltip("axis") %>%
       e_x_axis(name = "Date", splitLine = hide) %>%
       e_y_axis(name = "Articles", splitLine = hide) %>%
-      e_datazoom() %>%
+      e_visual_map(n, show = FALSE) %>% 
+      e_grid(left = 25, right = 10, bottom = 20, top = 5) %>% 
+      e_mark_line(
+        data = avg,
+        precision = 0,
+        label = list(
+          position = "middle"
+        )
+      ) %>% 
       e_theme(THEME) %>%
       e_text_style(fontFamily = .font())
 
@@ -403,11 +491,12 @@ overview <- function(input, output, session, pool){
 
     country() %>%
       e_charts(thread_country, dispose = FALSE) %>%
-      e_map_3d(n, name = "Articles by countries") %>%
-      e_visual_map(n, orient = "horizontal", bottom = "5%", right = "5%") %>%
+      e_map_3d(n, name = "Number of articles") %>%
+      e_visual_map(n, show = FALSE) %>%
       e_theme(THEME) %>%
-      e_text_style(fontFamily = .font()) %>%
+      e_text_style(fontFamily = .font()) %>% 
       e_tooltip()
+    
   })
 
 }

@@ -42,7 +42,9 @@ homeUI <- function(id){
         ),
         column(
           8,
-          uiOutput(ns("recent"))
+          h4("Latest article was published on",
+             textillate::textillateOutput(ns("recent")),
+             class = "pull-right")
         )
       )
     )
@@ -52,18 +54,21 @@ homeUI <- function(id){
 
 home <- function(input, output, session, pool){
 
-  output$recent <- renderUI({
+  output$recent <- textillate::renderTextillate({
 
     latest <- dbGetQuery(pool, "SELECT MAX(published) FROM 'articles';") %>%
       unlist() %>%
       unname() %>%
       as.Date()
 
-    h4(
-      class = "pull-right",
-      "Latest article was published on",
-      format(latest, "%d %B %Y")
-    )
+    textillate::textillate(
+      format(latest, "%d %B %Y"),
+      min.display.time = 5000
+    ) %>% 
+      textillate::textillateIn(
+        effect = "tada",
+        shuffle = TRUE
+      )
   })
 
 }

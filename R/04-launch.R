@@ -64,12 +64,6 @@ launch_auritus <- function(){
       href = paste0("https://fonts.googleapis.com/css?family=", font_name),
       rel = "stylesheet"
     ),
-    tags$link(
-      rel = "stylesheet",
-      href = paste0(
-        "https://unpkg.com/bulmaswatch/", theme,"/bulmaswatch.min.css"
-      )
-    ),
     tags$style(
       paste0("*{font-family: '", font, "', sans-serif;}")
     )
@@ -143,8 +137,9 @@ launch_auritus <- function(){
         class = "container",
         fluidRow(
           column(
-            3, 
+            12, 
             "Developed with",
+            class = "pull-right",
             tags$a(
               href = "https://auritus.io",
               target = "_blank",

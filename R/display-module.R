@@ -1,3 +1,5 @@
+#' Disaply level
+#' @param id A namesapce id.
 displayUI <- function(id){
 
   ns <- NS(id)
@@ -11,6 +13,11 @@ displayUI <- function(id){
 
 }
 
+#' Display server
+#' @param input,output,session Usual Shiny server arguments.
+#' @param heading Text heading.
+#' @param react the reactive.
+#' @param tooltip The tooltip.
 display <- function(input, output, session, heading, react, tooltip){
 
   output$heading <- renderUI({
