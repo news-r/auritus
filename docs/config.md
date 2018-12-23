@@ -8,6 +8,12 @@ Required parameters are:
 - `token`: your [webhose.io](https://webhose.io/) token to collect the data.
 - `queries`: your boolean searches to query the data.
 
+Optional parameters include:
+
+- `style`: customise the visual appearance of the platform.
+- `segments`: Segment your data.
+- `tracking`: Google Analytics tracking.
+
 ## Token
 
 Your _required_ [webhose.io](https://webhose.io/) token. Simply create a free account to get it. [webhose.io](https://webhose.io/) provides 1,000 free queries per month, which, if maximised, can add up to as many as 100,000 results (blog posts and news articles). 
@@ -31,7 +37,7 @@ queries:
   - wine:
     - id: 1
     - name: "ML"
-    - search: '("machine learning" OR AI) AND programming is_first:true language:english'
+    - search: '("machine learning$" OR AI) AND programming is_first:true language:english'
 ```
 
 ## Database
@@ -124,7 +130,8 @@ A [Google Fonts](https://fonts.google.com/) name, defaults to `Raleway`. Note th
 
 An [echarts4r theme name](https://echarts4r.john-coene.com/articles/themes.html):
 
-- `default` (default)
+- `default` 
+- `auritus` (default)
 - `dark`
 - `vintage`
 - `westeros`

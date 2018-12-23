@@ -81,6 +81,12 @@ sudo ufw allow 3838
 
 _You can change the port in the configuration file._
 
-Your project folder which contains, at least, `app.R` and `_auritus.yml`, must be copied under `srv/shiny-server/`, you can do so however you prefer, i.e.: using Git. You can then visit your application at `domain.com/my-directory` 
+Your project folder which contains, at least, `app.R` and `_auritus.yml`, must be copied under `srv/shiny-server/`, you can do so however you prefer, i.e.: using Git. You can then visit your application at `domain.com/my-directory` .
+
+Note that some options such as the `theme` require the server to be restarted in order to take effect; you can do so with.
+
+```bash
+sudo systemctl restart shiny-server
+```
 
 <!-- tabs:end -->
