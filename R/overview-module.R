@@ -488,7 +488,7 @@ overview <- function(input, output, session, pool){
         left = 25, 
         right = 10, 
         bottom = 20, 
-        top = 5
+        top = 20
       ) %>% 
       e_legend(right = 25) %>% 
       e_mark_line(
