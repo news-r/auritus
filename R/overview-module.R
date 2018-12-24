@@ -60,8 +60,21 @@ overviewUI <- function(id){
         class = "well",
         h3("SENTIMENT", id = "sentiment-headline"),
         p("Three day rolling sentiment average."),
-        tippy_this("sentiment-headline", "Distribution of sentiment."),
+        tippy_this("sentiment-headline", "Three day rolling sentiment average."),
         echarts4rOutput(ns("sentimentChart"), height = 230)
+      ),
+      br(),
+      fluidRow(
+        column(
+          6,
+          div(
+            class = "well",
+            h3("OUTLETS", id = "outlets-headline"),
+            p("Top media outlets by number of articles."),
+            tippy_this("outlets-headline", "Top media outlets by number of articles."),
+            echarts4rOutput(ns("outlets"), height = 400)
+          )
+        )
       )
     )
   )
@@ -379,6 +392,25 @@ overview <- function(input, output, session, pool){
       filter(!is.na(sent_lag))
     
   })
+  
+  media_data <- reactive({
+    
+    req(input$daterangeOut, input$sitetypesOut)
+    dates <- input$daterangeOut
+    
+    base_query <- "SELECT thread_site, COUNT(thread_site) AS n FROM articles"
+    date_query <- .dates2query(input$daterangeOut)
+    type_query <- .type2query(input$sitetypesOut)
+    
+    query <- paste(base_query, date_query, type_query, 
+                   "GROUP BY thread_site  HAVING COUNT(thread_site) > 1 ORDER BY count(thread_site) DESC LIMIT 150;")
+    
+    dbGetQuery(pool, query) %>%
+      mutate(
+        thread_site = gsub("\\..*", "", thread_site)
+      )
+    
+  })
 
   output$sentimentChart <- renderEcharts4r({
     
@@ -514,6 +546,72 @@ overview <- function(input, output, session, pool){
       e_text_style(fontFamily = .font()) %>% 
       e_tooltip() %>% 
       e_toolbox_feature(feature = "saveAsImage") 
+    
+  })
+  
+  output$outlets <- renderEcharts4r({
+    
+    media_data() %>% 
+      e_color_range(n, color, colors = c("#8adbdb", "#516d8a")) %>% 
+      e_charts() %>% 
+      e_cloud(thread_site, n, color, shape = "circle") %>% 
+      e_grid(
+        left = 25, 
+        right = 10, 
+        bottom = 20, 
+        top = 20
+      ) %>% 
+      e_theme(THEME) %>%
+      e_text_style(fontFamily = .font()) %>% 
+      e_tooltip() %>% 
+      e_toolbox_feature(feature = "saveAsImage") 
+    
+  })
+  
+  observeEvent(input$outlets_clicked_data, {
+    
+    sel <- input$outlets_clicked_data$name
+    
+    dates <- input$daterangeOut
+    
+    date_query <- .dates2query(input$daterangeOut)
+    type_query <- .type2query(input$sitetypesOut)
+    outlet_query <- paste0("AND thread_site LIKE '%", sel, "%'")
+    
+    query <- paste0(
+      "SELECT thread_main_image, thread_title, thread_url FROM 'articles' ", 
+      date_query, type_query, outlet_query, " ORDER BY topmedia DESC;"
+    )
+    
+    dat <- dbGetQuery(pool, query)
+    
+    tgs <- tagList()
+    for(i in 1:nrow(dat)){
+      art <- tags$li(
+        class = "list-group-item",
+        tags$img(
+          src = dat$thread_main_image[i],
+          height = 70
+        ),
+        tags$a(
+          href = dat$thread_url[i],
+          dat$thread_title[i],
+          target = "blank"
+        )
+      )
+      tgs <- tagAppendChild(tgs, art)
+    }
+    
+    showModal(
+      modalDialog(
+        tags$ul(
+          class = "list-group",
+          tgs
+        ),
+        title = paste("Articles from", sel),
+        easyClose = TRUE
+      )
+    )
     
   })
 
