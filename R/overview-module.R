@@ -382,6 +382,8 @@ overview <- function(input, output, session, pool){
 
   output$sentimentChart <- renderEcharts4r({
     
+    rng <- range(sentiment_chart()$sent_lag)
+    
     sentiment_chart() %>% 
       e_charts(published) %>% 
       e_area(
@@ -395,7 +397,9 @@ overview <- function(input, output, session, pool){
       e_y_axis(
         axisLine = hide, 
         axisTick = hide, 
-        axisLabel = hide
+        axisLabel = hide,
+        min = rng[1],
+        max = rng[2]
       ) %>% 
       e_grid(
         left = 10, 

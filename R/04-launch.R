@@ -91,15 +91,39 @@ launch_auritus <- function(){
 
     head <- tagAppendChild(head, ga_tag)
   }
+  
+  # check connection
+  db <- settings$database
+  db$drv <- .type2drv(db$type)
+  db$type <- NULL # remove type before call
+  
+  can_connect <- do.call(DBI::dbCanConnect, db)
+  
+  if(!isTRUE(can_connect)){
+    msg <- cat(
+      crayon::red(cli::symbol$cross), " Cannot connect to the ", crayon::underline("database"), ", check your settings in ", crayon::underline("_auritus.yml"), ".\n",
+      sep = ""
+    )
+    return(msg)
+  }
 
   if("database" %in% settings_list){
-    db <- settings$database
-    db$drv <- .type2drv(db$type)
-    db$type <- NULL # remove type before call
     pool <- do.call(pool::dbPool, db)
   } else {
     msg <- cat(crayon::red(cli::symbol$cross), "_auritus.yml has no ", crayon::underline("database"), " specified.\n", sep = "")
     return(msg)
+  }
+  
+  tables <- DBI::dbListTables(pool)
+  
+  if(length(tables) == 0){
+    msg <- cat(
+      crayon::red(cli::symbol$cross), 
+      "No data in database, run", 
+      crayon::underline("crawl_data"), 
+      "function.\n"
+    )
+    pool::poolClose(pool) # close pool
   }
 
   onStop(function() {

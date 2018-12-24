@@ -15,7 +15,7 @@
 #'
 #' @name crawl
 #' @export
-crawl_data <- function(days = 30L, quiet = FALSE, pages = 50L, append = FALSE,
+crawl_data <- function(days = 30L, quiet = FALSE, pages = 50L, append = TRUE,
                        apply_segments = TRUE, since_last = TRUE, pause = 5, overwrite = FALSE, ...){
 
   config <- "_auritus.yml"

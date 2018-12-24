@@ -66,7 +66,7 @@ home <- function(input, output, session, pool){
       min.display.time = 5000
     ) %>% 
       textillate::textillateIn(
-        effect = "tada",
+        effect = "rollIn",
         shuffle = TRUE
       )
   })

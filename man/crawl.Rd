@@ -5,7 +5,7 @@
 \alias{crawl_data}
 \title{Initial Crawl}
 \usage{
-crawl_data(days = 30L, quiet = FALSE, pages = 50L, append = FALSE,
+crawl_data(days = 30L, quiet = FALSE, pages = 50L, append = TRUE,
   apply_segments = TRUE, since_last = TRUE, pause = 5,
   overwrite = FALSE, ...)
 }

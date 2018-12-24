@@ -12,7 +12,7 @@ token: "fd17174d-53ab-49d7-b19a-3351220490e7"
 # minimum setup = 1 query
 # each query MUST have an id and a search
 queries:
-  - wine:
+  - query:
     - id: 1
     - name: "Wine Brands"
     - search: '(Woodbridge OR "Sutter Home" OR Barefoot OR Franzia OR "Yellow Tail$") AND ("wine$" OR "champagne$" OR "mousseux$") is_first:true language:english'
@@ -37,7 +37,7 @@ segments:
   - segment:
     - query: 1
     - name: "Bubbles"
-    - regex: "Bubbles|bubbles|Champagne|champagne|Mousseux|mousseux|sparkling|Sparling"
+    - regex: "Bubbles|bubbles|Champagne|champagne|Mousseux|mousseux|sparkling|Sparkling"
 
 # analytics to track site usage
 tracking:
