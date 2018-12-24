@@ -195,11 +195,21 @@ crawl_data <- function(days = 30L, quiet = FALSE, pages = 50L, append = TRUE,
         crawled = as.character(crawled)
       )
   }
+  
+  cat(crayon::green(cli::symbol$tick), nrow(articles), "articles collected.")
 
   con <- do.call(DBI::dbConnect, db)
-  dbWriteTable(con, "articles", articles, append = append, overwrite = overwrite)
+  resp <- tryCatch(
+    dbWriteTable(con, "articles", articles, append = append, overwrite = overwrite),
+    error = function(e) e
+  )
   dbDisconnect(con)
 
-  cat(crayon::green(cli::symbol$tick), nrow(articles), "articles collected.")
+  if(inherits(resp, "error")){
+    msg <- cat(
+      crayon::red(cli::symbol$cross), "Could not append data:\n",
+      resp$message
+    )
+  }
 
 }

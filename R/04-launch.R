@@ -49,11 +49,6 @@ launch_auritus <- function(){
     echarts4r_theme <- settings[["style"]][["chart_theme"]]
   }
 
-  options(
-    echarts4r_theme = echarts4r_theme,
-    font = font
-  )
-
   font_name <- gsub("[[:space:]]", "+", font)
 
   inverse <- settings$style$inverse %||% FALSE
@@ -115,6 +110,21 @@ launch_auritus <- function(){
   }
   
   tables <- DBI::dbListTables(pool)
+  
+  segments <- suppressWarnings(
+    settings$segments %>% 
+      purrr::map(as.data.frame) %>% 
+      purrr::map_df(bind_rows)
+  )
+  
+  segments_names <- .segment2name(segments$segment.name)
+  
+  options(
+    echarts4r_theme = echarts4r_theme,
+    font = font,
+    segments = segments$segment.name,
+    segments_name = segments_names
+  )
   
   if(length(tables) == 0){
     msg <- cat(
@@ -178,7 +188,6 @@ launch_auritus <- function(){
   )
 
   server <- function(input, output, session){
-
     callModule(home, "home", pool)
     callModule(overview, "overview", pool)
     callModule(segment, "segment", pool)

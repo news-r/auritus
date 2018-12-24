@@ -32,7 +32,9 @@
 #' Segment to valid column name
 #' @param x A segment name
 .segment2name <- function(x){
-  gsub("[[:space:]]|[[:cntrl:]]|[[:blank:]]|[[:punct:]]", "", x)
+  x <- iconv(x, from = "UTF-8", to = "ASCII//TRANSLIT")
+  x <- gsub("[[:space:]]|[[:cntrl:]]|[[:blank:]]|[[:punct:]]", "", x)
+  tolower(x)
 }
 
 #' Segment
@@ -119,5 +121,18 @@
 .dates2query <- function(dates){
   paste0(
     "WHERE published >= '", dates[1], " 00:00:00' AND published <= '", dates[2], " 23:59:59'"
+  )
+}
+
+#' Segment selection to query
+#' @param input Segment selected choices.
+#' @param type Segment type.
+.select_segments <- function(input, type = "text"){
+  
+  x <- .segment2name(input)
+  
+  paste(
+    paste0(x, "_", type, "_segment"),
+    collapse = ", "
   )
 }

@@ -103,7 +103,7 @@ overview <- function(input, output, session, pool){
     
     shinyWidgets::checkboxGroupButtons(
       inputId = ns("sitetypesOut"), 
-      label = "Label", 
+      label = "TYPES", 
       choices = choices, 
       selected = choices,
       justified = TRUE, 
@@ -317,7 +317,7 @@ overview <- function(input, output, session, pool){
     type_query <- .type2query(input$sitetypesOut)
 
     query <- paste0(
-      "SELECT published FROM 'articles' ", date_query, type_query, ";"
+      "SELECT query_name, published FROM 'articles' ", date_query, type_query, ";"
     )
 
     published <- dbGetQuery(pool, query)
@@ -327,7 +327,7 @@ overview <- function(input, output, session, pool){
         published = as.POSIXct(published, origin = "1970-01-01"),
         published = as.Date(published)
       ) %>%
-      count(published)
+      count(query_name, published)
 
   })
 
@@ -384,7 +384,7 @@ overview <- function(input, output, session, pool){
     
     rng <- range(sentiment_chart()$sent_lag)
     
-    sentiment_chart() %>% 
+    sentiment_chart() %>%
       e_charts(published) %>% 
       e_area(
         sent_lag, 
@@ -415,7 +415,8 @@ overview <- function(input, output, session, pool){
         )
       ) %>% 
       e_theme(THEME) %>%
-      e_text_style(fontFamily = .font()) 
+      e_text_style(fontFamily = .font()) %>% 
+      e_toolbox_feature(feature = "saveAsImage") 
     
   })
   
@@ -459,35 +460,47 @@ overview <- function(input, output, session, pool){
       e_text_style(fontFamily = .font()) %>% 
       e_tooltip(
         formatter = htmlwidgets::JS("function(params){return(params.value[0] + '%')}")
-      )
+      ) %>% 
+      e_toolbox_feature(feature = "saveAsImage") 
 
   })
 
   output$trend <- renderEcharts4r({
 
     trend_data() %>%
+      group_by(query_name) %>% 
       e_charts(published, dispose = FALSE) %>%
       e_area(
         n,
-        name = "articles",
-        legend = FALSE,
         smooth = TRUE,
         smoothMonotone = "x"
       ) %>%
       e_tooltip("axis") %>%
-      e_x_axis(name = "Date", splitLine = hide) %>%
-      e_y_axis(name = "Articles", splitLine = hide) %>%
-      e_visual_map(n, show = FALSE) %>% 
-      e_grid(left = 25, right = 10, bottom = 20, top = 5) %>% 
+      e_x_axis(
+        name = "Date", 
+        splitLine = hide
+      ) %>%
+      e_y_axis(
+        name = "Articles", 
+        splitLine = hide
+      ) %>%
+      e_grid(
+        left = 25, 
+        right = 10, 
+        bottom = 20, 
+        top = 5
+      ) %>% 
+      e_legend(right = 25) %>% 
       e_mark_line(
         data = avg,
         precision = 0,
         label = list(
           position = "middle"
         )
-      ) %>% 
+      ) %>%
       e_theme(THEME) %>%
-      e_text_style(fontFamily = .font())
+      e_text_style(fontFamily = .font()) %>% 
+      e_toolbox_feature(feature = "saveAsImage") 
 
   })
 
@@ -499,7 +512,8 @@ overview <- function(input, output, session, pool){
       e_visual_map(n, show = FALSE) %>%
       e_theme(THEME) %>%
       e_text_style(fontFamily = .font()) %>% 
-      e_tooltip()
+      e_tooltip() %>% 
+      e_toolbox_feature(feature = "saveAsImage") 
     
   })
 
