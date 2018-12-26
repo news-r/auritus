@@ -15,7 +15,7 @@ queries:
   - query:
     - id: 1
     - name: "Wine Brands"
-    - search: '("Woodbridge$" OR "Sutter$ Home$" OR "Barefoot$" OR "Franzia$" OR "Yellow$ Tail$") AND ("wine$" OR "champagne$" OR "mousseux$" OR "alcohol$") is_first:true language:english'
+    - search: '("Woodbridge$" OR "Sutter$ Home$" OR "Barefoot$" OR "Franzia$" OR "Yellow$ Tail$") AND ("wine$" OR "champagne$") is_first:true language:english spam_score:<=0.8'
 
 # segments to categorise your data
 # regex:
@@ -24,20 +24,24 @@ queries:
 segments:
   - segment:
     - query: 1
-    - name: "Rosé"
-    - regex: "Rosé|rosé|rose|Rose"
+    - name: "Woodbridge"
+    - regex: "Woodbridge"
   - segment:
     - query: 1
-    - name: "White"
-    - regex: "White|white"
+    - name: "Sutter Home"
+    - regex: "Sutter Home"
   - segment:
     - query: 1
-    - name: "Red"
-    - regex: "Red|red"
+    - name: "Barefoot"
+    - regex: "Barefoot"
   - segment:
     - query: 1
-    - name: "Bubbles"
-    - regex: "Bubbles|bubbles|Champagne|champagne|Mousseux|mousseux|sparkling|Sparkling"
+    - name: "Franzia"
+    - regex: "Franzia"
+  - segment:
+    - query: 1
+    - name: "Yellow Tail"
+    - regex: "Yellow Tail"
 
 # analytics to track site usage
 tracking:

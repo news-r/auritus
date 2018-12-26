@@ -101,16 +101,19 @@ crawl_data <- function(days = 30L, quiet = FALSE, pages = 50L, append = TRUE,
   if(isTRUE(since_last)){
     con <- do.call(DBI::dbConnect, db)
     ts_query <- tryCatch(
-      dbGetQuery(con, "SELECT MAX(crawled) FROM 'articles';"),
+      dbGetQuery(con, "SELECT MAX(crawled) AS max FROM 'articles';") %>% pull(max),
       error = function(e) e
     )
     dbDisconnect(con)
 
     if(inherits(ts_query, "numeric"))
-      ts_query <- as.POSIXct(ts_query[[1]], origin = "1970-01-01 12:00")
+      ts_query <- as.POSIXct(ts_query, origin = "1970-01-01 12:00")
+    
+    if(inherits(ts_query, "character"))
+      ts_query <- as.POSIXct(ts_query)
 
     if(!inherits(ts_query, "error"))
-      TS <- as.numeric(ts_query)
+      TS <- as.character(as.integer(ts_query))
   }
 
   if("segments" %in% settings_list){
@@ -124,7 +127,7 @@ crawl_data <- function(days = 30L, quiet = FALSE, pages = 50L, append = TRUE,
       )
     }
 
-    # give user a change to stop process
+    # give user a chance to stop process
     cat(
       "\n",
       crayon::yellow(cli::symbol$warning), " Hit ", crayon::underline("CTRL + C"), ", or ", crayon::underline("ESC"), " to cancel.\n",
@@ -149,9 +152,10 @@ crawl_data <- function(days = 30L, quiet = FALSE, pages = 50L, append = TRUE,
     query <- webhoser::wh_news(
       settings$token,
       q$search,
-      ts = as.numeric(TS),
+      ts = TS,
       quiet = quiet,
-      highlight = TRUE
+      highlight = TRUE,
+      ...
     ) %>%
       webhoser::wh_paginate(pages) %>%
       webhoser::wh_collect(flatten = TRUE) %>%

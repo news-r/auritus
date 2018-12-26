@@ -22,7 +22,6 @@ segmentUI <- function(id){
           div(
             class = "well",
             h3("TREND", id = "trend-headline"),
-            p("Number of articles per day and segment."),
             tippy_this("trend-headline", "Number of articles per day and segment."),
             echarts4rOutput(ns("trend"), height = 250)
           )
@@ -31,9 +30,8 @@ segmentUI <- function(id){
           4,
           div(
             class = "well",
-            h3("SHARE", id = "share-headline"),
-            p("Number of articles per segment."),
-            tippy_this("share-headline", "Number of articles that mentin each segment."),
+            h3("ARTICLES", id = "articles-headline"),
+            tippy_this("articles-headline", "Number of articles that mentiOn each segment."),
             echarts4rOutput(ns("segmentCount"), height = 250)
           )
         )
@@ -44,7 +42,6 @@ segmentUI <- function(id){
           div(
             class = "well",
             h3("NARRATIVE", id = "narrative-headline"),
-            p("How each segment drives the narrative."),
             tippy_this("narrative-headline", "Articles that mention the segment in the first paragraph as percentage of articles that mention every respective segment."),
             echarts4rOutput(ns("narrative"), height = 250)
           )

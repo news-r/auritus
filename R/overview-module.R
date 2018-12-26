@@ -39,7 +39,6 @@ overviewUI <- function(id){
           div(
             class = "well",
             h3("TREND", id = "trend-headline"),
-            p("Number of articles per day."),
             tippy_this("trend-headline", "Number of articles per day."),
             echarts4rOutput(ns("trend"))
           )
@@ -49,7 +48,6 @@ overviewUI <- function(id){
           div(
             class = "well",
             h3("REACH", id = "map-headline"),
-            p("Number of articles published per country."),
             tippy_this("map-headline", "Number of articles per country."),
             echarts4rOutput(ns("map"))
           )
@@ -59,7 +57,6 @@ overviewUI <- function(id){
       div(
         class = "well",
         h3("SENTIMENT", id = "sentiment-headline"),
-        p("Three day rolling sentiment average."),
         tippy_this("sentiment-headline", "Three day rolling sentiment average."),
         echarts4rOutput(ns("sentimentChart"), height = 230)
       ),
@@ -70,9 +67,17 @@ overviewUI <- function(id){
           div(
             class = "well",
             h3("OUTLETS", id = "outlets-headline"),
-            p("Top media outlets by number of articles."),
             tippy_this("outlets-headline", "Top media outlets by number of articles."),
             echarts4rOutput(ns("outlets"), height = 400)
+          )
+        ),
+        column(
+          6,
+          div(
+            class = "well",
+            h3("PLACES", id = "locations-headline"),
+            tippy_this("locations-headline", "Locations mentioned in the articles."),
+            echarts4rOutput(ns("locations"), height = 400)
           )
         )
       )
@@ -295,7 +300,7 @@ overview <- function(input, output, session, pool){
   callModule(display, "narticles", heading = "ARTICLES", react = n_articles, tooltip = "Total number of articles")
   callModule(display, "noutlets", heading = "MEDIA OUTLETS", react = n_outlets, tooltip = "Number of media outlets reached")
   callModule(display, "nshares", heading = "FACEBOOK SHARES", react = n_shares, tooltip = "Number of Facebook shares")
-  callModule(display, "sentiment", heading = "SENTIMENT", react = sentiment, tooltip = "Average setniment")
+  callModule(display, "sentiment", heading = "SENTIMENT", react = sentiment, tooltip = "Average sentiment score")
   callModule(display, "language", heading = "TOP LANGUAGE", react = language, tooltip = "Most popular language by number of articles")
   callModule(display, "topmedia", heading = "TOP OUTLET", react = topmedia, tooltip = "Most popular outlet by number of articles")
   callModule(display, "nwords", heading = "ARTICLE LENGTH", react = nwords, tooltip = "Average number of words per article")
@@ -409,6 +414,25 @@ overview <- function(input, output, session, pool){
       mutate(
         thread_site = gsub("\\..*", "", thread_site)
       )
+    
+  })
+  
+  location_data <- reactive({
+    
+    req(input$daterangeOut, input$sitetypesOut)
+    dates <- input$daterangeOut
+    
+    base_query <- "SELECT entities_locations FROM articles"
+    date_query <- .dates2query(input$daterangeOut)
+    type_query <- .type2query(input$sitetypesOut)
+    
+    query <- paste(base_query, date_query, type_query, 
+                   "AND entities_locations <> '';")
+    
+    dbGetQuery(pool, query) %>% 
+      tidyr::separate_rows(entities_locations, sep = ",") %>% 
+      count(entities_locations, sort = T) %>% 
+      slice(1:150)
     
   })
 
@@ -568,6 +592,25 @@ overview <- function(input, output, session, pool){
     
   })
   
+  output$locations <- renderEcharts4r({
+    
+    location_data() %>% 
+      e_color_range(n, color, colors = c("#8adbdb", "#516d8a")) %>% 
+      e_charts() %>% 
+      e_cloud(entities_locations, n, color, shape = "circle") %>% 
+      e_grid(
+        left = 25, 
+        right = 10, 
+        bottom = 20, 
+        top = 20
+      ) %>% 
+      e_theme(THEME) %>%
+      e_text_style(fontFamily = .font()) %>% 
+      e_tooltip() %>% 
+      e_toolbox_feature(feature = "saveAsImage") 
+    
+  })
+  
   observeEvent(input$outlets_clicked_data, {
     
     sel <- input$outlets_clicked_data$name
@@ -580,7 +623,54 @@ overview <- function(input, output, session, pool){
     
     query <- paste0(
       "SELECT thread_main_image, thread_title, thread_url FROM 'articles' ", 
-      date_query, type_query, outlet_query, " ORDER BY topmedia DESC;"
+      date_query, type_query, outlet_query, " ORDER BY lexdiv DESC;"
+    )
+    
+    dat <- dbGetQuery(pool, query)
+    
+    tgs <- tagList()
+    for(i in 1:nrow(dat)){
+      art <- tags$li(
+        class = "list-group-item",
+        tags$img(
+          src = dat$thread_main_image[i],
+          height = 70
+        ),
+        tags$a(
+          href = dat$thread_url[i],
+          dat$thread_title[i],
+          target = "blank"
+        )
+      )
+      tgs <- tagAppendChild(tgs, art)
+    }
+    
+    showModal(
+      modalDialog(
+        tags$ul(
+          class = "list-group",
+          tgs
+        ),
+        title = paste("Articles from", sel),
+        easyClose = TRUE
+      )
+    )
+    
+  })
+  
+  observeEvent(input$locations_clicked_data, {
+    
+    sel <- input$locations_clicked_data$name
+    
+    dates <- input$daterangeOut
+    
+    date_query <- .dates2query(input$daterangeOut)
+    type_query <- .type2query(input$sitetypesOut)
+    outlet_query <- paste0("AND entities_locations LIKE '%", sel, "%'")
+    
+    query <- paste0(
+      "SELECT thread_main_image, thread_title, thread_url FROM 'articles' ", 
+      date_query, type_query, outlet_query, " ORDER BY lexdiv DESC;"
     )
     
     dat <- dbGetQuery(pool, query)
