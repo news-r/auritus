@@ -5,6 +5,7 @@
 auritus is an open-source, freely available platform to collect, analyse and visualse your news coverage. 
 
 <img src="overview.png" height = 200 />
+<img src="segments.png" height = 200 />
 
 ## What it does
 
