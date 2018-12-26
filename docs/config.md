@@ -51,7 +51,13 @@ Currently, auritus supports:
 - `Postgres`
 - `MariaDB`
 
-The default setup as provided by `init_auritus`, uses an `SQLite` database which is the simplest possible to setup. SQLite does not require you to setup anything so leave it as is if you do not know about databases. Otherwise you are advised to use another `type` such as `Postgres` which will be much more performant and not stored on disk. However, SQLite might be good enough, depending on the amount of data you expect. 
+The default setup as provided by `init_auritus`, uses an `SQLite` database which is the simplest possible to setup. SQLite does not require you to setup anything so leave it as is if you do not know about databases. 
+
+> SQLite is _not_ advised, it should only be used locally for testing purposes.
+
+You are advised to use another `type` such as `Postgres` which will be much more performant and not stored on disk. However, SQLite might be good enough, depending on the amount of data you expect. 
+
+Most of the computations are handled by the database via SQL, it is therefore advised to use a databse other than SQLite in deployment.
 
 When using a database you must specify, at least:
 
@@ -76,12 +82,12 @@ A Postgres database.
 database:
   type: Postgres
   dbname: auritus
-  host: ":memory:"
+  host: "http://192.167.101.22"
   user: postgres
   password: 123456
 ```
 
-Note that you may need to create the database yourself before referencing it in `_auritus.yml`, depending on the database `type` you use. SQLite databases do _not_ need to be initialised, and may simply specified in the configuration file.
+Note that you may need to create the database yourself before referencing it in `_auritus.yml`, depending on the database `type` you use. 
 
 ## Style
 

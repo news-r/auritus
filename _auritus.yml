@@ -24,24 +24,20 @@ queries:
 segments:
   - segment:
     - query: 1
-    - name: "Woodbridge"
-    - regex: "Woodbridge"
+    - name: "Rosé"
+    - regex: "Rosé|rosé"
   - segment:
     - query: 1
-    - name: "Sutter Home"
-    - regex: "Sutter Home"
+    - name: "White"
+    - regex: "White|white"
   - segment:
     - query: 1
-    - name: "Barefoot"
-    - regex: "Barefoot"
+    - name: "Red"
+    - regex: "red|Red"
   - segment:
     - query: 1
-    - name: "Franzia"
-    - regex: "Franzia"
-  - segment:
-    - query: 1
-    - name: "Yellow Tail"
-    - regex: "Yellow Tail"
+    - name: "Bubbles"
+    - regex: "bubbles|Bubbles|champagne|Champgane|mousseux|Mousseux"
 
 # analytics to track site usage
 tracking:

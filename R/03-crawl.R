@@ -182,6 +182,7 @@ crawl_data <- function(days = 30L, quiet = FALSE, pages = 50L, append = TRUE,
       query <- .segment(query, segments, q$id[i])
     }
 
+    query$text <- NULL
     articles <- plyr::rbind.fill(articles, query)
 
   }

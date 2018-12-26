@@ -21,8 +21,8 @@ segmentUI <- function(id){
           8,
           div(
             class = "well",
-            h3("TREND", id = "trend-headline"),
-            tippy_this("trend-headline", "Number of articles per day and segment."),
+            h3("TREND", id = "trend-segments-headline"),
+            tippy_this("trend-segments-headline", "Number of articles per day and segment."),
             echarts4rOutput(ns("trend"), height = 250)
           )
         ),
@@ -30,8 +30,8 @@ segmentUI <- function(id){
           4,
           div(
             class = "well",
-            h3("ARTICLES", id = "articles-headline"),
-            tippy_this("articles-headline", "Number of articles that mentiOn each segment."),
+            h3("ARTICLES", id = "articles-segments-headline"),
+            tippy_this("articles-segments-headline", "Number of articles that mentiOn each segment."),
             echarts4rOutput(ns("segmentCount"), height = 250)
           )
         )
@@ -41,9 +41,18 @@ segmentUI <- function(id){
           4,
           div(
             class = "well",
-            h3("NARRATIVE", id = "narrative-headline"),
-            tippy_this("narrative-headline", "Articles that mention the segment in the first paragraph as percentage of articles that mention every respective segment."),
+            h3("NARRATIVE", id = "narrative-segments-headline"),
+            tippy_this("narrative-segments-headline", "Proportion of articles that mention the segment where the segment is in the first paragraph of the article."),
             echarts4rOutput(ns("narrative"), height = 250)
+          )
+        ),
+        column(
+          8,
+          div(
+            class = "well",
+            h3("OUTLETS", id = "outlets-segments-headline"),
+            tippy_this("outlets-segments-headline", "Top media outlets per segment."),
+            echarts4rOutput(ns("outlets"), height = 250)
           )
         )
       )
@@ -155,7 +164,7 @@ segment <- function(input, output, session, pool){
     date_query <- .dates2query(input$daterangeOut)
     type_query <- .type2query(input$sitetypesOut)
     segment_query_1p <- .select_segments(input$segmentsOut, type = "1p")
-    segment_query_text <- .select_segments(input$segmentsOut, type = "text")
+    segment_query_text <- .select_segments(input$segmentsOut, type = "total")
     
     query <- paste0(
       "SELECT ", segment_query_1p, ", ", segment_query_text, " FROM 'articles' ", date_query, type_query, ";"
@@ -167,10 +176,10 @@ segment <- function(input, output, session, pool){
       tidyr::gather(
         segments,
         value,
-        contains("text_")
+        contains("total_")
       ) %>% 
       mutate(
-        segments = gsub("_text_segment", "", segments),
+        segments = gsub("_total_segment", "", segments),
         segments = tools::toTitleCase(segments)
       ) %>% 
       group_by(segments) %>% 
@@ -195,7 +204,9 @@ segment <- function(input, output, session, pool){
       mutate(
         value = value / total
       ) %>% 
-      mutate(value = round(value * 100, 2))
+      mutate(
+        value = round(value * 100, 2)
+      )
     
   })
   
@@ -206,7 +217,7 @@ segment <- function(input, output, session, pool){
     
     date_query <- .dates2query(input$daterangeOut)
     type_query <- .type2query(input$sitetypesOut)
-    segment_query <- .select_segments(input$segmentsOut, type = "text")
+    segment_query <- .select_segments(input$segmentsOut, type = "total")
     
     query <- paste0(
       "SELECT ", segment_query, " FROM 'articles' ", date_query, type_query, ";"
@@ -218,10 +229,10 @@ segment <- function(input, output, session, pool){
       tidyr::gather(
         segments,
         value,
-        contains("text_")
+        contains("total_")
       ) %>% 
       mutate(
-        segments = gsub("_text_segment", "", segments),
+        segments = gsub("_total_segment", "", segments),
         segments = tools::toTitleCase(segments),
         value = case_when(
           value > 0 ~ 1,
@@ -231,6 +242,57 @@ segment <- function(input, output, session, pool){
       group_by(segments) %>% 
       summarise(n = sum(value)) 
     
+  })
+  
+  n_outlets <- reactive({
+    
+    req(input$daterangeOut, input$sitetypesOut, input$segmentsOut)
+    dates <- input$daterangeOut
+    
+    date_query <- .dates2query(input$daterangeOut)
+    type_query <- .type2query(input$sitetypesOut)
+    segment_query <- .select_segments(input$segmentsOut, type = "total")
+    
+    query <- paste0(
+      "SELECT ", segment_query, ", thread_site FROM 'articles' ", date_query, type_query, ";"
+    )
+    
+    dat <- dbGetQuery(pool, query) 
+    
+    dat %>% 
+      tidyr::gather(
+        segments,
+        value,
+        contains("total_")
+      ) %>% 
+      filter(value > 0) %>% 
+      count(thread_site, segments) %>% 
+      filter(n > 1) %>% 
+      arrange(-n) %>% 
+      slice(1:100) %>% 
+      mutate(
+        segments = gsub("_total_segment", "", segments),
+        segments = tools::toTitleCase(segments)
+      )
+    
+  })
+  
+  output$outlets <- renderEcharts4r({
+    n_outlets() %>% 
+      group_by(segments) %>% 
+      e_charts(thread_site) %>% 
+      e_bar(n, stack = "stacked") %>% 
+      e_grid(
+        left = 25, 
+        right = 20, 
+        bottom = 20, 
+        top = 5
+      ) %>% 
+      e_legend(right = 20) %>% 
+      e_tooltip(trigger = "axis") %>% 
+      e_theme(THEME) %>%
+      e_text_style(fontFamily = .font()) %>% 
+      e_toolbox_feature(feature = "saveAsImage") 
   })
   
   output$segmentCount <- renderEcharts4r({
