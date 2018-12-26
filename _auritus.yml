@@ -15,7 +15,7 @@ queries:
   - query:
     - id: 1
     - name: "Wine Brands"
-    - search: '("Woodbridge$" OR "Sutter$ Home$" OR "Barefoot$" OR "Franzia$" OR "Yellow$ Tail$") AND ("wine$" OR "champagne$") is_first:true language:english spam_score:<=0.8'
+    - search: '("pinot$" OR "sauvignon$" OR "chardonnay$" OR "merlot$" OR "shiraz$" OR "cabernet$" OR "riesling$" OR "malbec$" OR "zinfandel$" OR "gewürztraminer$" OR "muscat$" OR "sémillon$") AND ("wine$" OR "wines$" OR "champagne$") is_first:true language:english spam_score:<=0.8'
 
 # segments to categorise your data
 # regex:
