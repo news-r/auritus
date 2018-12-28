@@ -49,5 +49,8 @@ tracking:
 # must include dbname
 # Any other option to pass to DBI::dbConnect
 database:
-  type: "SQLite"
+  type: "PostgreSQL"
   dbname: "articles"
+  host: "localhost"
+  user: "jcoe"
+  password: ""

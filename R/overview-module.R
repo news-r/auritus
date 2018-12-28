@@ -100,11 +100,14 @@ overview <- function(input, output, session, pool){
 
     ns <- session$ns
 
-    query <- "SELECT MIN(published) AS min, MAX(published) AS max FROM articles;"
+    query <- "SELECT MIN(published), MAX(published) FROM articles;"
     range <- dbGetQuery(pool, query) %>%
       unname() %>%
       unlist()
 
+    if(inherits(range, "numeric"))
+      range <- as.POSIXct(range, origin = "1970-01-01 12:00")
+    
     range <- as.Date(range)
 
     dateRangeInput(ns("daterangeOut"), "DATE RANGE", min = range[1], max = range[2], start = range[1], end = range[2])
@@ -155,7 +158,7 @@ overview <- function(input, output, session, pool){
     req(input$daterangeOut, input$sitetypesOut)
     dates <- input$daterangeOut
 
-    base_query <- "SELECT thread_site, COUNT(DISTINCT thread_site) AS n FROM articles"
+    base_query <- "SELECT COUNT(DISTINCT thread_site) AS n FROM articles"
     
     date_query <- .dates2query(input$daterangeOut)
 
@@ -224,7 +227,7 @@ overview <- function(input, output, session, pool){
     type_query <- .type2query(input$sitetypesOut)
     
     query <- paste(
-      base_query, date_query, type_query, ";"
+      base_query, date_query, type_query, "GROUP BY language;"
     )
     
     N <- dbGetQuery(pool, query) %>%
@@ -236,22 +239,18 @@ overview <- function(input, output, session, pool){
   topmedia <- reactive({
     
     req(input$daterangeOut, input$sitetypesOut)
-    dates <- input$daterangeOut
     
     base_query <- "SELECT thread_site, COUNT(thread_site) AS n FROM articles"
-    
     date_query <- .dates2query(input$daterangeOut)
-    
     type_query <- .type2query(input$sitetypesOut)
     
-    query <- paste(base_query, date_query, type_query, ";")
+    query <- paste(base_query, date_query, type_query, 
+                   "GROUP BY thread_site  HAVING COUNT(thread_site) > 1 ORDER BY count(thread_site) DESC LIMIT 1;")
     
-    N <- dbGetQuery(pool, query) %>%
-      pull(thread_site)
-    
-    N <- gsub("\\..*", "", N)
-    
-    return(N)
+    dbGetQuery(pool, query) %>%
+      mutate(
+        thread_site = gsub("\\..*", "", thread_site)
+      )
     
   })
   
@@ -335,7 +334,7 @@ overview <- function(input, output, session, pool){
     type_query <- .type2query(input$sitetypesOut)
 
     query <- paste0(
-      "SELECT query_name, published FROM 'articles' ", date_query, type_query, ";"
+      "SELECT query_name, published FROM articles ", date_query, type_query, ";"
     )
 
     published <- dbGetQuery(pool, query)
@@ -358,7 +357,7 @@ overview <- function(input, output, session, pool){
     type_query <- .type2query(input$sitetypesOut)
 
     query <- paste0(
-      "SELECT thread_site_type AS type, COUNT(thread_site_type) AS n FROM 'articles' ", 
+      "SELECT thread_site_type AS type, COUNT(thread_site_type) AS n FROM articles ", 
       date_query, type_query,
       "GROUP BY thread_site_type ORDER BY count(thread_site_type) DESC;"
     )
@@ -375,7 +374,7 @@ overview <- function(input, output, session, pool){
     type_query <- .type2query(input$sitetypesOut)
     
     query <- paste0(
-      "SELECT published, sentiment FROM 'articles' ", 
+      "SELECT published, sentiment FROM articles ", 
       date_query, type_query,
       ";"
     )

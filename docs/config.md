@@ -48,7 +48,7 @@ Currently, auritus supports:
 
 - `SQLite`
 - `MySQL`
-- `Postgres`
+- `PostgreSQL`
 - `MariaDB`
 
 The default setup as provided by `init_auritus`, uses an `SQLite` database which is the simplest possible to setup. SQLite does not require you to setup anything so leave it as is if you do not know about databases. 

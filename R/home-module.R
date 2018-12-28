@@ -56,10 +56,14 @@ home <- function(input, output, session, pool){
 
   output$recent <- textillate::renderTextillate({
 
-    latest <- dbGetQuery(pool, "SELECT MAX(published) FROM 'articles';") %>%
+    latest <- dbGetQuery(pool, "SELECT MAX(published) FROM articles;") %>%
       unlist() %>%
-      unname() %>%
-      as.Date()
+      unname()
+    
+    if(inherits(latest, "numeric"))
+      latest <- as.POSIXct(latest, origin = "1970-01-01 12:00")
+    
+    latest <- as.Date(latest)
 
     textillate::textillate(
       format(latest, "%d %B %Y"),

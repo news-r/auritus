@@ -23,7 +23,12 @@ segmentUI <- function(id){
             class = "well",
             h3("TREND", id = "trend-segments-headline"),
             tippy_this("trend-segments-headline", "Number of articles per day and segment."),
-            echarts4rOutput(ns("trend"), height = 250)
+            echarts4rOutput(ns("trend"), height = 256),
+            br(),
+            br(),
+            h3("OUTLETS", id = "outlets-segments-headline"),
+            tippy_this("outlets-segments-headline", "Top media outlets per segment."),
+            echarts4rOutput(ns("outlets"), height = 256)
           )
         ),
         column(
@@ -33,26 +38,12 @@ segmentUI <- function(id){
             h3("ARTICLES", id = "articles-segments-headline"),
             tippy_this("articles-segments-headline", "Number of articles that mentiOn each segment."),
             echarts4rOutput(ns("segmentCount"), height = 250)
-          )
-        )
-      ),
-      fluidRow(
-        column(
-          4,
+          ),
           div(
             class = "well",
             h3("NARRATIVE", id = "narrative-segments-headline"),
             tippy_this("narrative-segments-headline", "Proportion of articles that mention the segment where the segment is in the first paragraph of the article."),
             echarts4rOutput(ns("narrative"), height = 250)
-          )
-        ),
-        column(
-          8,
-          div(
-            class = "well",
-            h3("OUTLETS", id = "outlets-segments-headline"),
-            tippy_this("outlets-segments-headline", "Top media outlets per segment."),
-            echarts4rOutput(ns("outlets"), height = 250)
           )
         )
       )
@@ -78,6 +69,9 @@ segment <- function(input, output, session, pool){
     range <- dbGetQuery(pool, query) %>%
       unname() %>%
       unlist()
+    
+    if(inherits(range, "numeric"))
+      range <- as.POSIXct(range, origin = "1970-01-01 12:00")
     
     range <- as.Date(range)
     
@@ -132,7 +126,7 @@ segment <- function(input, output, session, pool){
     segment_query <- .select_segments(input$segmentsOut, type = "text")
     
     query <- paste0(
-      "SELECT published, ", segment_query, " FROM 'articles' ", date_query, type_query, ";"
+      "SELECT published, ", segment_query, " FROM articles ", date_query, type_query, ";"
     )
     
     published <- dbGetQuery(pool, query)
@@ -167,7 +161,7 @@ segment <- function(input, output, session, pool){
     segment_query_text <- .select_segments(input$segmentsOut, type = "total")
     
     query <- paste0(
-      "SELECT ", segment_query_1p, ", ", segment_query_text, " FROM 'articles' ", date_query, type_query, ";"
+      "SELECT ", segment_query_1p, ", ", segment_query_text, " FROM articles ", date_query, type_query, ";"
     )
     
     dat <- dbGetQuery(pool, query)
@@ -220,7 +214,7 @@ segment <- function(input, output, session, pool){
     segment_query <- .select_segments(input$segmentsOut, type = "total")
     
     query <- paste0(
-      "SELECT ", segment_query, " FROM 'articles' ", date_query, type_query, ";"
+      "SELECT ", segment_query, " FROM articles ", date_query, type_query, ";"
     )
     
     dat <- dbGetQuery(pool, query)
@@ -254,7 +248,7 @@ segment <- function(input, output, session, pool){
     segment_query <- .select_segments(input$segmentsOut, type = "total")
     
     query <- paste0(
-      "SELECT ", segment_query, ", thread_site FROM 'articles' ", date_query, type_query, ";"
+      "SELECT ", segment_query, ", thread_site FROM articles ", date_query, type_query, ";"
     )
     
     dat <- dbGetQuery(pool, query) 
@@ -288,7 +282,8 @@ segment <- function(input, output, session, pool){
         bottom = 20, 
         top = 5
       ) %>% 
-      e_legend(right = 20) %>% 
+      e_group("GRP") %>% 
+      e_legend(FALSE) %>% 
       e_tooltip(trigger = "axis") %>% 
       e_theme(THEME) %>%
       e_text_style(fontFamily = .font()) %>% 
@@ -349,6 +344,8 @@ segment <- function(input, output, session, pool){
         max = rng[2]
       ) %>% 
       e_legend(right = 25) %>% 
+      e_group("GRP") %>% 
+      e_connect_group("GRP") %>% 
       e_tooltip(trigger = "axis") %>% 
       e_theme(THEME) %>%
       e_text_style(fontFamily = .font()) %>% 

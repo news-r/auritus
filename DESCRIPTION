@@ -31,7 +31,7 @@ Suggests:
   RMySQL,
   RSQLite,
   RMariaDB,
-  RPostgres,
+  RPostgreSQL,
 RoxygenNote: 6.1.1
 Remotes:
   RStudio/pool,

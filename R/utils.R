@@ -90,8 +90,8 @@
 
   DRV <- NULL
 
-  if(x == "Postgres")
-    DRV <- RPostgres::Postgres()
+  if(x == "PostgreSQL")
+    DRV <- RPostgreSQL::PostgreSQL()
   else if (x == "MySQL")
     DRV <- RMySQL::MySQL()
   else if(x == "MariaDB")
