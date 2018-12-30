@@ -21,8 +21,6 @@ queries:
 # replace or delete
 tracking:
   ganalytics: "UA-74544116-1"
-  hotjar: null
-
 
 # segments to categorise your data
 # regex:
@@ -38,10 +36,6 @@ segments:
     - query: 1
     - name: "Second Segment"
     - regex: null
-
-# analytics to track site usage
-tracking:
-  ganalytics: "UA-12345-6"
 
 # database
 # must include type

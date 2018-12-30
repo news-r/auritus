@@ -57,10 +57,16 @@ You will also need the R package relevant to your database `type` (in `_auritus.
 ```bash
 # SQLite
 sudo su - -c "R -e \"install.packages('RSQLite', repos='https://cran.rstudio.com/')\""
+```
+```bash
 # Postgres
 sudo su - -c "R -e \"install.packages('RPostgres', repos='https://cran.rstudio.com/')\""
+```
+```bash
 # MySQL
 sudo su - -c "R -e \"install.packages('RMySQL', repos='https://cran.rstudio.com/')\""
+```
+```bash
 # MariaDB
 sudo su - -c "R -e \"install.packages('RMariaDB', repos='https://cran.rstudio.com/')\""
 ```
