@@ -1,6 +1,6 @@
 # auritus
 
-**This is a beta in R**
+**This is a beta**
 
 > Understand your news coverage.
 
@@ -23,3 +23,5 @@ Ever wanted to know about the news coverage you or your organisation receives? a
 - Customisable
 
 auritus is built with [Shiny](https://shiny.rstudio.com/), it relies on [webhose.io](https://webhose.io/) for the data, and [echarts4r](https://echarts4r.john-coene.com/) for the visualisations.
+
+You can find a demo [here](https://shiny.john-coene.com/auritus/)

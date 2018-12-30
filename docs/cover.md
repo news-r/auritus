@@ -5,7 +5,7 @@
 
 # Free, Open-source PR Monitoring Platform.
 
-[GitHub](https://github.com/JohnCoene/auritus)
+[Demo](https://shiny.john-coene.com/auritus/)
 [Get Started](guide)
 
 ![color](#f0f0f0)
