@@ -2,7 +2,7 @@
 
 Open-source PR monitoring platform, complete with a built-in crawler to for data collection. See the [website](https://auritus.io/) for more information.
 
-**This is a beta in R**
+**This is a beta**
 
 ## Installation
 
@@ -13,7 +13,7 @@ remotes::install_github("JohnCoene/auritus", dependencies = TRUE)
 
 ## Setup
 
-__Read the [documentation]() before doing any of this__
+__Read the [documentation](https://auritus.io/#/) before doing any of this__
 
 1. Run `ìnit_auritus`
 2. Configure your dashboard in `_auritus.yml`
