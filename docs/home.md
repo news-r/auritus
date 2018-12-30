@@ -1,11 +1,15 @@
 # auritus
 
+**This is a beta in R**
+
 > Understand your news coverage.
 
 auritus is an open-source, freely available platform to collect, analyse and visualse your news coverage. 
 
-<img src="overview.png" height = 200 />
-<img src="segments.png" height = 200 />
+<img src="overview.png" height = 250 />
+<img src="segments.png" height = 250 />
+<img src="clouds.png" height = 250 />
+<img src="theme.png" height = 250 />
 
 ## What it does
 

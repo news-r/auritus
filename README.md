@@ -2,6 +2,8 @@
 
 Open-source PR monitoring platform, complete with a built-in crawler to for data collection. See the [website](https://auritus.io/) for more information.
 
+**This is a beta in R**
+
 ## Installation
 
 ``` r

@@ -3,6 +3,7 @@ style:
   theme: paper # from: https://jenil.github.io/bulmaswatch/
   font: Raleway # google font
   chart_theme: auritus # echarts4r theme, from: https://echarts4r.john-coene.com/articles/themes
+  inverse: false
 
 # your webhose token
 # free @ webhose.io
