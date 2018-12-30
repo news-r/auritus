@@ -18,7 +18,7 @@ Ever wanted to know about the news coverage you or your organisation receives? a
 ## Features
 
 - Free & open-source
-- Easy to deploys
+- Easy to deploy
 - Comprehensive
 - Customisable
 
