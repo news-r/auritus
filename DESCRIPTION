@@ -22,7 +22,6 @@ Imports:
   magrittr,
   webhoser,
   echarts4r,
-  webhoserx,
   textillate,
   htmlwidgets,
   shinythemes,
@@ -31,6 +30,7 @@ Suggests:
   RMySQL,
   RSQLite,
   RMariaDB,
+  webhoserx,
   RPostgreSQL,
 RoxygenNote: 6.1.1
 Remotes:
