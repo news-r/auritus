@@ -92,6 +92,14 @@ launch_auritus <- function(){
   db$drv <- .type2drv(db$type)
   db$type <- NULL # remove type before call
   
+  if(is.null(db$drv)){
+    msg <- cat(
+      crayon::red(cli::symbol$cross), "Wrong database", crayon::underline("type"), 
+      "specified in _auritus.yml.\n"
+    )
+    return(msg)
+  }
+  
   can_connect <- do.call(DBI::dbCanConnect, db)
   
   if(!isTRUE(can_connect)){
