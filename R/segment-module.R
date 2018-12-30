@@ -1,3 +1,26 @@
+globalVariables(
+  c(
+    "published",
+    "thread_published",
+    "crawled",
+    "type",
+    "thread_site",
+    "thread_country",
+    "query_name",
+    "sent_lag",
+    "sent_lag1",
+    "sent_lag2",
+    "sent_lag3",
+    "entities_locations",
+    "x",
+    "color",
+    "segments",
+    "type",
+    "value",
+    "thread_site"
+  )
+)
+
 segmentUI <- function(id){
   
   ns <- NS(id)
@@ -193,7 +216,7 @@ segment <- function(input, output, session, pool){
       summarise(value = sum(value)) %>% 
       ungroup() %>% 
       left_join(
-        total, b = "segments"
+        total, by = "segments"
       ) %>% 
       mutate(
         value = value / total
@@ -230,7 +253,7 @@ segment <- function(input, output, session, pool){
         segments = tools::toTitleCase(segments),
         value = case_when(
           value > 0 ~ 1,
-          TRUE ~ 0
+          TRUE ~ 0
         )
       ) %>% 
       group_by(segments) %>% 
