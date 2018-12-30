@@ -1,5 +1,7 @@
 ![](man/figures/logo.png)
 
+[![Build Status](https://travis-ci.org/JohnCoene/auritus.svg?branch=master)](https://travis-ci.org/JohnCoene/auritus)
+
 Open-source PR monitoring platform, complete with a built-in crawler to for data collection. See the [website](https://auritus.io/) for more information.
 
 **This is a beta**
