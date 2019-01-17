@@ -12,6 +12,7 @@
 #' @import shiny
 #' @import dplyr
 #' @import echarts4r
+#' @import sigmajs
 #'
 #' @export
 setup_auritus <- function(days = 30L, quiet = FALSE, pages = 50L){

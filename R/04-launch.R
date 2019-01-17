@@ -173,6 +173,10 @@ launch_auritus <- function(){
       "SEGMENTS",
       segmentUI("segment")
     ),
+    tabPanel(
+      "NETWORKS",
+      networksUI("networks")
+    ),
     footer = tagList(
       hr(),
       div(
@@ -197,8 +201,9 @@ launch_auritus <- function(){
 
   server <- function(input, output, session){
     callModule(home, "home", pool)
-    callModule(overview, "overview", pool)
     callModule(segment, "segment", pool)
+    callModule(networks, "networks", pool)
+    callModule(overview, "overview", pool)
   }
 
   shinyApp(ui, server)

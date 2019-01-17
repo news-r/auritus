@@ -1,6 +1,6 @@
 Package: auritus
 Title: Open-Source Media Monitoring And Listening Platform
-Version: 0.0.1
+Version: 0.2.0
 Authors@R: person("John", "Coene", email = "jcoenep@gmail.com", role = c("aut", "cre"))
 Description: Open-Source Media Monitoring And Listening Platform.
 License: MIT + file LICENSE
@@ -19,6 +19,7 @@ Imports:
   tippy,
   tidyr,
   crayon,
+  sigmajs,
   magrittr,
   webhoser,
   echarts4r,
