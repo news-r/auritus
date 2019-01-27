@@ -149,7 +149,10 @@ networks <- function(input, output, session, pool){
     edges <- dbGetQuery(pool, query) %>% 
       tidyr::separate_rows(entities_persons, sep = ",") %>%
       mutate(entities_persons = stringr::word(entities_persons, 2)) %>% 
-      filter(!is.na(entities_persons)) %>% 
+      filter(
+        !is.na(entities_persons),
+        nchar(entities_persons) > 2
+      ) %>% 
       split(.$uuid) %>% 
       purrr::map_df(function(x){
         tidyr::crossing(
@@ -195,7 +198,12 @@ networks <- function(input, output, session, pool){
       sg_kill() %>% 
       sg_neighbours() %>% 
       sg_drag_nodes() %>% 
-      sg_cluster() %>% 
+      sg_cluster(
+        colors = c(
+          "#516d8a",
+          "#8adbdb"
+        )
+      ) %>% 
       sg_settings(
         edgeColor = "default",
         defaultEdgeColor = "#d3d3d3"
