@@ -31,6 +31,7 @@ networksUI <- function(id){
       )
     ),
     uiOutput(ns("segments")),
+    uiOutput(ns("slider")),
     hr(),
     sigmajsOutput(ns("graph"), height = "100vh")
   )
@@ -100,6 +101,33 @@ networks <- function(input, output, session, pool){
       checkIcon = list(yes = icon("ok", lib = "glyphicon"))
     )
     
+  })
+
+  output$slider <- renderUI({
+
+    req(input$segmentsOut)
+
+    ns <- session$ns
+
+    sliderInput(
+      ns("sliderOut"),
+      "Occurences greater than:", 
+      min(graph_data()$nodes$size), 
+      max(graph_data()$nodes$size), 
+      min(graph_data()$nodes$size),
+      step = 1,
+      ticks = FALSE,
+      animate = FALSE,
+      width = "100%"
+    )
+  })
+
+  observeEvent(input$sliderOut, {
+
+    ns <- session$ns
+
+    sigmajsProxy(ns("graph")) %>% 
+      sg_filter_gt_p(input$sliderOut, "size")
   })
   
   graph_data <- reactive({
