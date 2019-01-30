@@ -13,6 +13,7 @@
 #' @import dplyr
 #' @import echarts4r
 #' @import sigmajs
+#' @importFrom stats quantile
 #'
 #' @export
 setup_auritus <- function(days = 30L, quiet = FALSE, pages = 50L){

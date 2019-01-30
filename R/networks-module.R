@@ -1,3 +1,14 @@
+globalVariables(
+  c(
+    ".",
+    "from",
+    "to",
+    "name",
+    "target",
+    "label",
+    "size"
+  )
+)
 
 #' Personas module
 #' @param id namespace id.
