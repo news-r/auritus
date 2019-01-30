@@ -9,13 +9,27 @@ networksUI <- function(id){
     class = "container",
     fluidRow(
       column(
-        3, uiOutput(ns("daterange"))
+        2, uiOutput(ns("daterange"))
       ),
       column(
-        3, 
+        2, 
         shinyWidgets::pickerInput(
-          inputId = ns("type"), 
-          label = "Type", 
+          inputId = ns("from"), 
+          label = "From", 
+          c(
+            "Person" = "entities_persons",
+            "Organisations" = "entities_organizations",
+            "Places" = "entities_locations"
+          ),
+          selected = "entities_persons",
+          width = "100%"
+        )
+      ),
+      column(
+        2, 
+        shinyWidgets::pickerInput(
+          inputId = ns("to"), 
+          label = "to", 
           c(
             "Person" = "entities_persons",
             "Organisations" = "entities_organizations",
@@ -137,45 +151,33 @@ networks <- function(input, output, session, pool){
     segment_query <- .select_segments(input$segmentsOut, type = "text")
     
     query <- paste0(
-      "SELECT uuid, ", input$type, " AS entities_persons, ", segment_query, " FROM articles ", date_query, type_query, ";"
+      "SELECT uuid, ", input$from, " AS from,", input$to, " AS to, ", segment_query, " FROM articles ", date_query, type_query, ";"
     )
     
     progress <- shiny::Progress$new()
     on.exit(progress$close())
-    progress$set(message = "Computing", value = 0)
+    progress$set(message = "Computing", value = sample(seq(.1, .9, by = .1), 1))
     
-    progress$inc(.35, detail = "edges")
+    graph <- dbGetQuery(pool, query) %>% 
+      nethoser::connect(from, to)
     
-    edges <- dbGetQuery(pool, query) %>% 
-      tidyr::separate_rows(entities_persons, sep = ",") %>%
-      mutate(entities_persons = stringr::word(entities_persons, 2)) %>% 
-      filter(
-        !is.na(entities_persons),
-        nchar(entities_persons) > 2
-      ) %>% 
-      split(.$uuid) %>% 
-      purrr::map_df(function(x){
-        tidyr::crossing(
-          source = x$entities_persons, 
-          target = x$entities_persons
-        )
-      }) %>%
-      filter(target > source) %>% 
-      count(source, target, sort = TRUE) %>% 
-      mutate(id = 1:dplyr::n())
-    
-    progress$inc(.75, detail = "nodes")
-    
-    nodes <- bind_rows(
-      edges %>% select(id = source, size = n),
-      edges %>% select(id = target, size = n)
-    ) %>% 
-      group_by(id) %>% 
-      summarise(size = sum(size)) %>% 
-      ungroup() %>% 
-      mutate(size = scales::rescale(size, to = c(3, 20))) %>% 
+    nodes <- graph$nodes %>% 
       mutate(
-        label = id
+        id = entity
+      ) %>% 
+      select(
+        id,
+        label = entity,
+        size = n
+      )
+    
+    edges <- graph$edges %>% 
+      mutate(id = 1:dplyr::n()) %>% 
+      select(
+        id,
+        source, 
+        target,
+        weight = n
       )
     
     list(nodes = nodes, edges = edges)
@@ -206,7 +208,9 @@ networks <- function(input, output, session, pool){
       ) %>% 
       sg_settings(
         edgeColor = "default",
-        defaultEdgeColor = "#d3d3d3"
+        defaultEdgeColor = "#d3d3d3",
+        labelSize = "proportional",
+        labelThreshold = 999999
       )
     
   })

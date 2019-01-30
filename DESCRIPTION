@@ -22,6 +22,7 @@ Imports:
   sigmajs,
   magrittr,
   webhoser,
+  nethoser,
   echarts4r,
   textillate,
   htmlwidgets,
@@ -37,5 +38,6 @@ RoxygenNote: 6.1.1
 Remotes:
   RStudio/pool,
   JohnCoene/webhoser,
+  JohnCoene/nethoser,
   JohnCoene/webhoserx,
   JohnCoene/textillate
