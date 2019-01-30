@@ -80,6 +80,12 @@ overviewUI <- function(id){
             echarts4rOutput(ns("locations"), height = 400)
           )
         )
+      ),
+      div(
+        class = "well",
+        h3("SOPHISTICATION", id = "sophistication-headline"),
+        tippy_this("sophistication-headline", "Daily average language sophistication."),
+        echarts4rOutput(ns("lexdivChart"), height = 230)
       )
     )
   )
@@ -348,6 +354,34 @@ overview <- function(input, output, session, pool){
 
   })
 
+  lexdiv_data <- reactive({
+
+    req(input$daterangeOut, input$sitetypesOut)
+    dates <- input$daterangeOut
+
+    date_query <- .dates2query(input$daterangeOut)
+    
+    type_query <- .type2query(input$sitetypesOut)
+
+    query <- paste0(
+      "SELECT query_name, published, lexdiv FROM articles ", date_query, type_query, ";"
+    )
+
+    published <- dbGetQuery(pool, query)
+
+    published %>%
+      mutate(
+        published = as.POSIXct(published, origin = "1970-01-01"),
+        published = as.Date(published)
+      ) %>%
+      group_by(published) %>% 
+      summarise(
+        lexdiv = mean(lexdiv, na.rm = TRUE)
+      ) %>% 
+      ungroup()
+
+  })
+
   type_data <- reactive({
 
     req(input$daterangeOut, input$sitetypesOut)
@@ -448,6 +482,46 @@ overview <- function(input, output, session, pool){
         smooth = TRUE
       ) %>% 
       e_visual_map(sent_lag, show = FALSE) %>% 
+      e_tooltip(trigger = "axis") %>% 
+      e_y_axis(
+        axisLine = hide, 
+        axisTick = hide, 
+        axisLabel = hide,
+        min = rng[1],
+        max = rng[2]
+      ) %>% 
+      e_grid(
+        left = 10, 
+        right = 10, 
+        bottom = 20, 
+        top = 5
+      ) %>% 
+      e_mark_line(
+        data = avg,
+        precision = 0,
+        label = list(
+          position = "middle"
+        )
+      ) %>% 
+      e_theme(THEME) %>%
+      e_text_style(fontFamily = .font()) %>% 
+      e_toolbox_feature(feature = "saveAsImage") 
+    
+  })
+
+  output$lexdivChart <- renderEcharts4r({
+    
+    rng <- range(lexdiv_data()$lexdiv)
+    
+    lexdiv_data() %>%
+      e_charts(published) %>% 
+      e_area(
+        lexdiv, 
+        name = "Sophistication", 
+        legend = FALSE,
+        smooth = TRUE
+      ) %>% 
+      e_visual_map(lexdiv, show = FALSE) %>% 
       e_tooltip(trigger = "axis") %>% 
       e_y_axis(
         axisLine = hide, 

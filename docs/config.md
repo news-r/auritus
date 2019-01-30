@@ -97,10 +97,10 @@ The default configuration looks like this:
 
 ```yaml
 style:
-  theme: default
+  theme: paper
   font: Raleway 
-  chart_theme: default 
-  inverse: fasle
+  chart_theme: auritus 
+  inverse: false
 ```
 
 ### Inverse

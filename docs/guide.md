@@ -17,6 +17,23 @@ remotes::install_github("JohnCoene/auritus", upgrade = "never")
 
 The above will install the `remotes` package if it is not installed already then use the latter to install auritus from [Github](https://github.com/JohnCoene/auritus).
 
+_From source_
+
+You can install the package from source by first cloning the repository
+
+```bash
+git clone https://github.com/JohnCoene/auritus.git
+```
+
+Then from the source directory:
+
+```r
+if(!"devtools" %in% row.names(installed.packages()))
+  install.packages("devtools")
+
+devtools::install()
+```
+
 Once the auritus package installed, load it and follow the instructions below to initialise your project.
 
 ```r

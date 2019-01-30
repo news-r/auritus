@@ -1,8 +1,8 @@
 globalVariables(
   c(
     ".",
-    "from",
-    "to",
+    "tgt",
+    "src",
     "name",
     "target",
     "label",
@@ -30,9 +30,10 @@ networksUI <- function(id){
           c(
             "Person" = "entities_persons",
             "Organisations" = "entities_organizations",
-            "Places" = "entities_locations"
+            "Places" = "entities_locations",
+			"Media" = "thread_site"
           ),
-          selected = "entities_persons",
+          selected = "thread_site",
           width = "100%"
         )
       ),
@@ -177,6 +178,12 @@ networks <- function(input, output, session, pool){
     }
     
     graph <- dbGetQuery(pool, query) %>% 
+      tidyr::gather(
+        segments,
+        value,
+        contains("text_")
+      ) %>% 
+	  filter(value > 0) %>% 
       nethoser::net_con(src, tgt, callback = callback)
     
     nodes <- graph$nodes %>% 

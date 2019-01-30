@@ -1,5 +1,6 @@
 * [Home](/)
 * [Config](config.md)
 * [Quick Start](guide.md)
+* [Dashboards](dashboards.md)
 * [Deploy](deploy.md)
 * [Data](data.md)
