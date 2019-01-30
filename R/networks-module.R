@@ -45,7 +45,10 @@ networksUI <- function(id){
       )
     ),
     uiOutput(ns("segments")),
-    uiOutput(ns("slider")),
+    fluidRow(
+      column(8, uiOutput(ns("slider"))),
+      column(4, sliderInput(ns("cb"), "Filter edges", 0, max = .9, value = .5, step = .1, width = "100%"))
+    ),
     hr(),
     sigmajsOutput(ns("graph"), height = "100vh")
   )
@@ -125,7 +128,7 @@ networks <- function(input, output, session, pool){
 
     sliderInput(
       ns("sliderOut"),
-      "Occurences greater than:", 
+      "Filter nodes:", 
       min(graph_data()$nodes$size), 
       max(graph_data()$nodes$size), 
       min(graph_data()$nodes$size),
@@ -158,16 +161,20 @@ networks <- function(input, output, session, pool){
     on.exit(progress$close())
     progress$set(message = "Computing", value = sample(seq(.1, .9, by = .1), 1))
     
+    callback <- function(x){
+      filter(x, n > quantile(n, input$cb))
+    }
+    
     graph <- dbGetQuery(pool, query) %>% 
-      nethoser::connect(from, to)
+      nethoser::net_con(from, to, callback = callback)
     
     nodes <- graph$nodes %>% 
       mutate(
-        id = entity
+        id = name
       ) %>% 
       select(
         id,
-        label = entity,
+        label = name,
         size = n
       )
     
@@ -192,6 +199,12 @@ networks <- function(input, output, session, pool){
       input$segmentsOut
     )
     
+    cols <- .get_colors()
+    
+    progress <- shiny::Progress$new()
+    on.exit(progress$close())
+    progress$set(message = "Drawing", value = sample(seq(.1, .9, by = .1), 1))
+    
     sigmajs() %>% 
       sg_nodes(graph_data()$nodes, id, label, size) %>% 
       sg_edges(graph_data()$edges, id, source, target) %>% 
@@ -201,15 +214,11 @@ networks <- function(input, output, session, pool){
       sg_neighbours() %>% 
       sg_drag_nodes() %>% 
       sg_cluster(
-        colors = c(
-          "#516d8a",
-          "#8adbdb"
-        )
+        colors = cols$pal
       ) %>% 
       sg_settings(
         edgeColor = "default",
         defaultEdgeColor = "#d3d3d3",
-        labelSize = "proportional",
         labelThreshold = 999999
       )
     

@@ -79,6 +79,32 @@
   getOption("echarts4r_theme")
 }
 
+.get_colors <- function(){
+  theme <- getOption("echarts4r_theme")
+  
+  file <- 
+    system.file(
+      paste0(
+        "htmlwidgets/lib/echarts-4.3.2/themes/", theme, ".js"
+      ), 
+      package = "echarts4r"
+    )
+  
+  js <- readLines(file)
+  
+  N <- ifelse(js[1] == "", 24, 23)
+  
+  json <- js[N:(length(js) - 2)] %>% 
+    paste0(collapse = "") %>% 
+    paste0("{", ., "}") %>% 
+    jsonlite::fromJSON()
+  
+  list(
+    pal = json$visualMap$color,
+    bg = json$backgroundColor
+  )
+}
+
 #' Get font
 .font <- function(){
   getOption("font")
