@@ -165,7 +165,7 @@ networks <- function(input, output, session, pool){
     segment_query <- .select_segments(input$segmentsOut, type = "text")
     
     query <- paste0(
-      "SELECT uuid, ", input$from, " AS from,", input$to, " AS to, ", segment_query, " FROM articles ", date_query, type_query, ";"
+      "SELECT uuid, ", input$from, " AS src,", input$to, " AS tgt, ", segment_query, " FROM articles ", date_query, type_query, ";"
     )
     
     progress <- shiny::Progress$new()
@@ -177,7 +177,7 @@ networks <- function(input, output, session, pool){
     }
     
     graph <- dbGetQuery(pool, query) %>% 
-      nethoser::net_con(from, to, callback = callback)
+      nethoser::net_con(src, tgt, callback = callback)
     
     nodes <- graph$nodes %>% 
       mutate(
