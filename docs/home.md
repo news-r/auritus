@@ -22,6 +22,6 @@ Ever wanted to know about the news coverage you or your organisation receives? a
 - Comprehensive
 - Customisable
 
-auritus is built with [Shiny](https://shiny.rstudio.com/), it relies on [webhose.io](https://webhose.io/) for the data, [echarts4r](https://echarts4r.john-coene.com/) for the visualisations, and the networks with [sigmajs](https://sigmajs.john-coene.com/).
+auritus is built with [Shiny](https://shiny.rstudio.com/), it relies on [webhose.io](https://webhose.io/) for the data, [echarts4r](https://echarts4r.john-coene.com/) for the visualisations, and [sigmajs](https://sigmajs.john-coene.com/) for the networks.
 
 You can find a demo [here](https://shiny.john-coene.com/auritus/)
