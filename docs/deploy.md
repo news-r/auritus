@@ -49,7 +49,7 @@ Note that all packages should be installed as above so that all users (including
 Now install auritus.
 
 ```bash
-sudo su - -c "R -e \"remotes::install_github('JohnCoene/auritus')\""
+sudo su - -c "R -e \"remotes::install_github('news-r/auritus')\""
 ```
 
 You will also need the R package relevant to your database `type` (in `_auritus.yml`).

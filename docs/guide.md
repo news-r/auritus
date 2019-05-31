@@ -12,17 +12,17 @@ Then run the following from the R console:
 if(!"remotes" %in% row.names(installed.packages()))
   install.packages("remotes")
   
-remotes::install_github("JohnCoene/auritus", upgrade = "never")
+remotes::install_github("news-r/auritus", upgrade = "never")
 ```
 
-The above will install the `remotes` package if it is not installed already then use the latter to install auritus from [Github](https://github.com/JohnCoene/auritus).
+The above will install the `remotes` package if it is not installed already then use the latter to install auritus from [Github](https://github.com/news-r/auritus).
 
 _From source_
 
 You can install the package from source by first cloning the repository
 
 ```bash
-git clone https://github.com/JohnCoene/auritus.git
+git clone https://github.com/news-r/auritus.git
 ```
 
 Then from the source directory:
