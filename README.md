@@ -10,7 +10,7 @@ Open-source PR monitoring platform, complete with a built-in crawler to for data
 
 ``` r
 # install.packages("remotes")
-remotes::install_github("JohnCoene/auritus", dependencies = TRUE)
+remotes::install_github("news-r/auritus", dependencies = TRUE)
 ```
 
 ## Setup
