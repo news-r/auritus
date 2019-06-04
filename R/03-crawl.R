@@ -149,9 +149,10 @@ crawl_data <- function(days = 30L, quiet = FALSE, pages = 50L, append = TRUE,
     if(is.null(q$name))
       q$name <- q$id
 
+    webhoser::wh_token(settings$token)
+
     query <- webhoser::wh_news(
-      settings$token,
-      q$search,
+      q = q$search,
       ts = TS,
       quiet = quiet,
       highlight = TRUE,
