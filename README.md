@@ -1,6 +1,9 @@
 ![](man/figures/logo.png)
 
-[![Build Status](https://travis-ci.org/JohnCoene/auritus.svg?branch=master)](https://travis-ci.org/JohnCoene/auritus)
+<!-- badges: start -->
+[![Travis build status](https://travis-ci.org/news-r/auritus.svg?branch=master)](https://travis-ci.org/news-r/auritus)
+[![AppVeyor build status](https://ci.appveyor.com/api/projects/status/github/news-r/auritus?branch=master&svg=true)](https://ci.appveyor.com/project/news-r/auritus)
+<!-- badges: end -->
 
 Open-source PR monitoring platform, complete with a built-in crawler to for data collection. See the [website](https://auritus.io/) for more information.
 

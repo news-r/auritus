@@ -1,6 +1,7 @@
 # auritus
 
-**This is a beta**
+[![Travis build status](https://travis-ci.org/news-r/auritus.svg?branch=master)](https://travis-ci.org/news-r/auritus)
+[![AppVeyor build status](https://ci.appveyor.com/api/projects/status/github/news-r/auritus?branch=master&svg=true)](https://ci.appveyor.com/project/news-r/auritus)
 
 > Understand your news coverage.
 
