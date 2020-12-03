@@ -5,7 +5,7 @@
 
 > Understand your news coverage.
 
-auritus is an open-source, freely available platform to collect, analyse and visualse your news coverage. 
+auritus is an open-source, freely available platform to collect, analyse and visualize your news coverage. 
 
 <img src="overview.png" height = 250 />
 <img src="networks.png" height = 250 />
